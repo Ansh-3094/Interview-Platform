@@ -15,6 +15,10 @@ app.get("/", (req, res) => {
   res.status(200).json({ msg: "Success from API" });
 });
 
+app.get("/books", (req, res) => {
+  res.status(200).json({ msg: "books bro books" });
+});
+
 const startServer = async () => {
   try {
     await connectDB();
