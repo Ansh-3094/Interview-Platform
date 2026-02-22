@@ -4,7 +4,7 @@ import { connectDB } from "./lib/db.js";
 import cors from "cors";
 const app = express();
 import { serve } from "inngest/express";
-import { inngest } from "./lib/inngest.js";
+import { inngest, functions } from "./lib/inngest.js";
 
 app.use(express.json());
 app.use(cors({ origin: ENV.CLIENT_URL, credentials: true }));
