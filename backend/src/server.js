@@ -24,7 +24,6 @@ const startServer = async () => {
   try {
     await connectDB();
 
-    // ✅ IMPORTANT CHANGE HERE
     const PORT = process.env.PORT || ENV.PORT || 5000;
 
     app.listen(PORT, () => {
