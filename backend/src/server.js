@@ -4,12 +4,21 @@ import { connectDB } from "./lib/db.js";
 import cors from "cors";
 import { serve } from "inngest/express";
 import { inngest, functions } from "./lib/inngest.js";
+import clerkWebhook from "./routes/clerkWebhook.js";
 
 const app = express();
 
+// 🔥 Clerk RAW webhook must be FIRST
+app.use("/api/clerk/webhook", express.raw({ type: "*/*" }));
+
+// Normal middleware
 app.use(express.json());
 app.use(cors({ origin: ENV.CLIENT_URL, credentials: true }));
 
+// Clerk webhook route
+app.use("/api/clerk", clerkWebhook);
+
+// Inngest endpoint
 app.use("/api/inngest", serve({ client: inngest, functions }));
 
 app.get("/", (req, res) => {
@@ -23,7 +32,6 @@ app.get("/books", (req, res) => {
 const startServer = async () => {
   try {
     await connectDB();
-
     const PORT = process.env.PORT || ENV.PORT || 5000;
 
     app.listen(PORT, () => {
