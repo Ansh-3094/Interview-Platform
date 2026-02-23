@@ -2,9 +2,10 @@ import express from "express";
 import { ENV } from "./lib/env.js";
 import { connectDB } from "./lib/db.js";
 import cors from "cors";
-const app = express();
 import { serve } from "inngest/express";
 import { inngest, functions } from "./lib/inngest.js";
+
+const app = express();
 
 app.use(express.json());
 app.use(cors({ origin: ENV.CLIENT_URL, credentials: true }));
@@ -22,11 +23,15 @@ app.get("/books", (req, res) => {
 const startServer = async () => {
   try {
     await connectDB();
-    app.listen(ENV.PORT, () => {
-      console.log("Server is running on port:", ENV.PORT);
+
+    // ✅ IMPORTANT CHANGE HERE
+    const PORT = process.env.PORT || ENV.PORT || 5000;
+
+    app.listen(PORT, () => {
+      console.log("Server is running on port:", PORT);
     });
   } catch (error) {
-    console.error("Error while starting the server");
+    console.error("Error while starting the server", error);
   }
 };
 
