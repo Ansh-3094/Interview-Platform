@@ -5,28 +5,43 @@ import cors from "cors";
 import { serve } from "inngest/express";
 import { inngest, functions } from "./lib/inngest.js";
 import clerkWebhook from "./routes/clerkWebhook.js";
+import { clerkMiddleware } from "@clerk/express";
+import { protectRoute } from "./middleware/protectRoute.js";
+import chatRoutes from "./routes/chatRoutes.js";
 
 const app = express();
 
-// 🔥 Clerk RAW webhook must be FIRST
 app.use("/api/clerk/webhook", express.raw({ type: "*/*" }));
 
-// Normal middleware
 app.use(express.json());
 app.use(cors({ origin: ENV.CLIENT_URL, credentials: true }));
 
-// Clerk webhook route
+app.use(clerkMiddleware());
+
 app.use("/api/clerk", clerkWebhook);
 
-// Inngest endpoint
 app.use("/api/inngest", serve({ client: inngest, functions }));
 
+app.use("/api/chat", chatRoutes);
+
 app.get("/", (req, res) => {
-  res.status(200).json({ msg: "Success from API" });
+  res.status(200).json({ message: "Success from abnsh API" });
 });
 
 app.get("/books", (req, res) => {
-  res.status(200).json({ msg: "books bro books" });
+  req.auth;
+  res.status(200).json({ message: "books bro books" });
+});
+
+//When you pass an array of middleware to express, it automatically flattens that and executes them sequentially, one by one. In this case it'll first run requireAuth() and then async function {Both are in protectRoute.js}. After this if its successfull the next() will run and in the end 'message' gets appeared.
+app.get("/video", protectRoute, (req, res) => {
+  res.status(200).json({
+    message: "Video call route is workin and this is a protected Route",
+  });
+});
+
+app.get("/food", protectRoute, (req, res) => {
+  res.status(200).json({ message: "Place your order; This is a food route" });
 });
 
 const startServer = async () => {
