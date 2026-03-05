@@ -55,6 +55,7 @@ export async function getActiveSessions(_, res) {
     const sessions = await Session.find({ status: "active" })
       //populate() replace a referenced ObjectId with actual document data from another collection.
       .populate("host", "name profileImage email clerkId")
+      .populate("participant", "name profileImage email clerkId")
       .sort({ createdAt: -1 })
       .limit(20);
 
