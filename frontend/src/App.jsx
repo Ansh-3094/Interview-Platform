@@ -1,17 +1,11 @@
-import {
-  SignInButton,
-  SignOutButton,
-  SignedOut,
-  SignedIn,
-  UserButton,
-  useUser,
-} from "@clerk/clerk-react";
+import { useUser } from "@clerk/clerk-react";
 import { Toaster } from "react-hot-toast";
-import { Routes, Route, Navigate } from "react-router";
-import HomePage from "./pages/HomePage";
-import ProblemsPage from "./pages/ProblemsPage";
-import ProblemPage from "./pages/ProblemPage";
-import DashboardPage from "./pages/DashboardPage";
+import { Navigate, Route, Routes } from "react-router";
+import DashboardPage from "./pages/DashboardPage.jsx";
+import HomePage from "./pages/HomePage.jsx";
+import ProblemPage from "./pages/ProblemPage.jsx";
+import ProblemsPage from "./pages/ProblemsPage.jsx";
+import SessionPage from "./pages/SessionPage.jsx";
 
 function App() {
   const { isSignedIn, isLoaded } = useUser();
@@ -37,6 +31,11 @@ function App() {
         <Route
           path="/problems"
           element={isSignedIn ? <ProblemsPage /> : <Navigate to={"/"} />}
+        />
+
+        <Route
+          path="/session/:id"
+          element={isSignedIn ? <SessionPage /> : <Navigate to={"/"} />}
         />
 
         <Route
