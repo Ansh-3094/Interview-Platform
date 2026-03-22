@@ -38,17 +38,24 @@ function DashboardPage() {
       },
       {
         onSuccess: (data) => {
+          const nestedSession = data?.session || data?.data?.session;
           const sessionId =
-            data?.session?._id ||
-            data?.data?.session?._id ||
+            nestedSession?._id ||
+            nestedSession?.id ||
+            data?.sessionId ||
+            data?.data?.sessionId ||
             data?._id ||
             data?.id;
 
           if (!sessionId) {
-            toast.error("Session created, but no session id was returned.");
+            toast.error(
+              data?.message ||
+                "Session created, but no session id was returned.",
+            );
             return;
           }
 
+          toast.success("Session created successfully!");
           setShowCreateModal(false);
           navigate(`/session/${sessionId}`);
         },
