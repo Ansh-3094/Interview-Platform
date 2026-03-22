@@ -13,10 +13,35 @@ import codeRoutes from "./routes/codeRoutes.js";
 
 const app = express();
 
+const allowedOrigins = [
+  ...(ENV.CLIENT_URL ? [ENV.CLIENT_URL] : []),
+  ...(ENV.CLIENT_URLS
+    ? ENV.CLIENT_URLS.split(",").map((origin) => origin.trim())
+    : []),
+  "http://localhost:5173",
+  "http://localhost:5174",
+].filter(Boolean);
+
+const allowedOriginSet = new Set(allowedOrigins);
+
 app.use("/api/clerk/webhook", express.raw({ type: "*/*" }));
 
 app.use(express.json());
-app.use(cors({ origin: ENV.CLIENT_URL, credentials: true }));
+app.use(
+  cors({
+    origin: (origin, callback) => {
+      // Allow non-browser requests (curl/Postman/server-to-server).
+      if (!origin) return callback(null, true);
+
+      if (allowedOriginSet.has(origin)) {
+        return callback(null, true);
+      }
+
+      return callback(new Error(`CORS blocked for origin: ${origin}`));
+    },
+    credentials: true,
+  }),
+);
 
 app.use(clerkMiddleware());
 
