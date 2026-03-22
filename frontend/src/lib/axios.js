@@ -17,4 +17,19 @@ const axiosInstance = axios.create({
   withCredentials: true, // By adding this field browser will send cookie to server automatically on every single request
 });
 
+axiosInstance.interceptors.request.use(async (config) => {
+  try {
+    const token = await window?.Clerk?.session?.getToken?.();
+
+    if (token) {
+      config.headers = config.headers || {};
+      config.headers.Authorization = `Bearer ${token}`;
+    }
+  } catch {
+    // If token retrieval fails, request will proceed and backend will return 401.
+  }
+
+  return config;
+});
+
 export default axiosInstance;
