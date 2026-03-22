@@ -1,81 +1,62 @@
-//Piston API is a service for code execution for multiple language
-const PISTON_API = "https://emkc.org/api/v2/piston";
+import axiosInstance from "./axios";
 
 const LANGUAGE_VERSIONS = {
-  javascript: { language: "javascript", version: "18.15.0" },
-  python: { language: "python", version: "3.10.0" },
-
-  java: { language: "java", version: "15.0.2" },
+  javascript: { language: "javascript", version: "*" },
+  python: { language: "python", version: "*" },
+  java: { language: "java", version: "*" },
 };
 
 /**
- * @param {string} language - Programing language
- * @param {string} code - Source code to execute
- * @returns {Promise<{success:boolean, output?:string, error?: string}>} -
+ * @param {string} language - programming language
+ * @param {string} code - source code to executed
+ * @returns {Promise<{success:boolean, output?:string, error?: string}>}
  */
-
 export async function executeCode(language, code) {
   try {
     const languageConfig = LANGUAGE_VERSIONS[language];
 
     if (!languageConfig) {
-      return { success: false, error: `Unsupported Language ${language}` };
-    }
-    const response = await fetch(`${PISTON_API}/execute`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        language: languageConfig.language,
-        version: languageConfig.version,
-        files: [
-          {
-            name: `main.${getFileExtention(language)}`,
-            content: code,
-          },
-        ],
-      }),
-    });
-
-    if (!response.ok) {
       return {
         success: false,
-        error: `HTTP error! status: ${response.status}`,
+        error: `Unsupported language: ${language}`,
       };
     }
 
-    const data = await response.json();
+    const response = await axiosInstance.post("/code/execute", {
+      language: languageConfig.language,
+      code,
+    });
 
-    const output = data.run?.output || "";
+    const data = response.data;
+    const run = data?.run || {};
 
-    const stderr = data.run?.stderr || "";
+    const stdout = run.stdout || "";
+    const stderr = run.stderr || "";
+    const output = run.output || `${stdout}${stderr}`;
+    const exitCode = typeof run.code === "number" ? run.code : stderr ? 1 : 0;
 
-    if (stderr) {
+    if (exitCode !== 0) {
       return {
         success: false,
-        output: output,
-        error: stderr,
+        output: output || stdout,
+        error: stderr || "Code execution failed",
       };
     }
 
     return {
       success: true,
-      output: output || "No output",
+      output: stdout || output || "No output",
     };
   } catch (error) {
+    const apiMessage = error?.response?.data?.message;
+    const apiDetails = error?.response?.data?.details;
+
     return {
       success: false,
-      error: `Failed to execute code: ${error.message}`,
+      error:
+        apiMessage || apiDetails
+          ? `${apiMessage || "Failed to execute code"}${apiDetails ? `: ${apiDetails}` : ""}`
+          : `Failed to execute code: ${error.message}`,
     };
   }
-}
-
-function getFileExtention(language) {
-  const extentions = {
-    javascript: "js",
-    python: "py",
-    java: "java",
-  };
-  return extentions[language] || "txt";
 }

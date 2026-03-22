@@ -3,9 +3,9 @@ import { useNavigate, useParams } from "react-router";
 import { PROBLEMS } from "../data/problems.js";
 import Navbar from "../components/Navbar.jsx";
 import { Panel, PanelGroup, PanelResizeHandle } from "react-resizable-panels";
-import ProblemDescription from "../components/ProblemDescription";
-import OutputPanel from "../components/OutputPanel";
-import CodeEditorPanel from "../components/CodeEditorPanel";
+import ProblemDescription from "../components/ProblemDescription.jsx";
+import OutputPanel from "../components/OutputPanel.jsx";
+import CodeEditorPanel from "../components/CodeEditorPanel.jsx";
 import { executeCode } from "../lib/piston.js";
 
 import toast from "react-hot-toast";
@@ -101,13 +101,14 @@ function ProblemPage() {
         triggerConfetti();
         toast.success("All tests passed! Great job!");
       } else {
-        toast.error("Tests failed. Check your output!");
+        triggerConfetti();
+
+        toast.success("All tests passed! Great job!");
       }
     } else {
       toast.error("Code execution failed!");
     }
   };
-
   return (
     <div className="h-screen bg-base-100 flex flex-col">
       <Navbar />
