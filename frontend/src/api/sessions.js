@@ -3,7 +3,14 @@ import axiosInstance from "../lib/axios";
 export const sessionApi = {
   createSession: async (data) => {
     const response = await axiosInstance.post("/sessions", data);
-    return response.data;
+    const payload = response.data;
+    const normalizedSession =
+      payload?.session || payload?.data?.session || payload?.data || payload;
+
+    return {
+      ...payload,
+      session: normalizedSession,
+    };
   },
 
   getActiveSessions: async () => {

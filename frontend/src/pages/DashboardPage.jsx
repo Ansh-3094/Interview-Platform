@@ -1,6 +1,7 @@
 import { useNavigate } from "react-router";
 import { useUser } from "@clerk/clerk-react";
 import { useState } from "react";
+import toast from "react-hot-toast";
 import {
   useActiveSessions,
   useCreateSession,
@@ -37,8 +38,19 @@ function DashboardPage() {
       },
       {
         onSuccess: (data) => {
+          const sessionId =
+            data?.session?._id ||
+            data?.data?.session?._id ||
+            data?._id ||
+            data?.id;
+
+          if (!sessionId) {
+            toast.error("Session created, but no session id was returned.");
+            return;
+          }
+
           setShowCreateModal(false);
-          navigate(`/session/${data.session._id}`);
+          navigate(`/session/${sessionId}`);
         },
       },
     );
