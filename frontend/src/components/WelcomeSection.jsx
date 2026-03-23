@@ -10,8 +10,8 @@ function WelcomeSection({ onCreateSession }) {
         <div className="flex items-center justify-between">
           <div>
             <div className="flex items-center gap-3 mb-4">
-              <div className="w-12 h-12 rounded-2xl bg-liner-to-br from-primary to-secondary flex items-center justify-center">
-                <SparklesIcon className="w-6 h-6 text-white" />
+              <div className="size-10 rounded-xl bg-linear-to-r from-primary via-secondary to-accent flex items-center justify-center shadow-lg">
+                <SparklesIcon className="size-6 text-white" />
               </div>
               <h1 className="text-5xl font-black bg-liner-to-r from-primary via-secondary to-accent bg-clip-text ">
                 Welcome back, {user?.firstName || "there"}!

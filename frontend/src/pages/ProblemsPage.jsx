@@ -52,7 +52,9 @@ function ProblemsPage() {
                           <span
                             className={`badge ${getDifficultyBadgeClass(problem.difficulty)}`}
                           >
-                            {problem.difficulty}
+                            {problem.mode === "freestyle"
+                              ? "Freestyle"
+                              : problem.difficulty}
                           </span>
                         </div>
                         <p className="text-sm text-base-content/60">
@@ -68,7 +70,9 @@ function ProblemsPage() {
                   {/* RIGHT SIDE */}
 
                   <div className="flex items-center gap-2 text-primary">
-                    <span className="font-medium">Solve</span>
+                    <span className="font-medium">
+                      {problem.mode === "freestyle" ? "Practice" : "Solve"}
+                    </span>
                     <ChevronRightIcon className="size-5" />
                   </div>
                 </div>

@@ -1,13 +1,15 @@
-function OutputPanel({ output }) {
+function OutputPanel({ output, isFreestyle = false }) {
   return (
     <div className="h-full bg-base-100 flex flex-col">
       <div className="px-4 py-2 bg-base-200 border-b border-base-300 font-semibold text-sm">
-        Output
+        {isFreestyle ? "Execution Output" : "Output"}
       </div>
       <div className="flex-1 overflow-auto p-4">
         {output === null ? (
           <p className="text-base-content/50 text-sm">
-            Click "Run Code" to see the output here...
+            {isFreestyle
+              ? "Run your code to see execution output here..."
+              : 'Click "Run Code" to see the output here...'}
           </p>
         ) : output.success ? (
           <pre className="text-sm font-mono text-success whitespace-pre-wrap">

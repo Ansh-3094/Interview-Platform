@@ -24,6 +24,7 @@ function ProblemPage() {
   const [isRunning, setIsRunning] = useState(false);
 
   const currentProblem = PROBLEMS[currentProblemId];
+  const isFreestyle = currentProblem?.mode === "freestyle";
 
   // This updates problem when URL param changes(If user chooses different problem from two sum to reverse string)
   useEffect(() => {
@@ -91,19 +92,26 @@ function ProblemPage() {
     setOutput(result);
     setIsRunning(false);
 
-    // check if code executed successfully and matches expected output
-
     if (result.success) {
+      if (isFreestyle) {
+        toast.success("Code executed successfully.");
+        return;
+      }
+
       const expectedOutput = currentProblem.expectedOutput[selectedLanguage];
+
+      if (!expectedOutput) {
+        toast.success("Code executed successfully.");
+        return;
+      }
+
       const testsPassed = checkIfTestsPassed(result.output, expectedOutput);
 
       if (testsPassed) {
         triggerConfetti();
         toast.success("All tests passed! Great job!");
       } else {
-        triggerConfetti();
-
-        toast.success("All tests passed! Great job!");
+        toast("Code ran, but output does not match expected result.");
       }
     } else {
       toast.error("Code execution failed!");
@@ -119,6 +127,7 @@ function ProblemPage() {
           <Panel defaultSize={40} minSize={30}>
             <ProblemDescription
               problem={currentProblem}
+              isFreestyle={isFreestyle}
               currentProblemId={currentProblemId}
               onProblemChange={handleProblemChange}
               allProblems={Object.values(PROBLEMS)}
@@ -147,7 +156,7 @@ function ProblemPage() {
               {/* Bottom panel - Output Panel*/}
 
               <Panel defaultSize={30} minSize={30}>
-                <OutputPanel output={output} />
+                <OutputPanel output={output} isFreestyle={isFreestyle} />
               </Panel>
             </PanelGroup>
           </Panel>

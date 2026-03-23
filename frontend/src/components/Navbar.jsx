@@ -5,9 +5,10 @@ import { UserButton } from "@clerk/clerk-react";
 function Navbar() {
   const location = useLocation();
 
-  //console.log(location);
-
-  const isActive = (path) => location.pathname === path;
+  const isProblemsRoute =
+    location.pathname === "/problems" ||
+    location.pathname.startsWith("/problem/");
+  const isDashboardRoute = location.pathname === "/dashboard";
 
   return (
     <nav className="bg-base-100/80 backdrop-blur-md border-b border-primary/20 sticky top-0 z-50 shadow-lg">
@@ -37,7 +38,7 @@ function Navbar() {
             to={"/problems"}
             className={`px-4 py-2.5 rounded-lg transition-all duration-200 
               ${
-                isActive("/problems")
+                isProblemsRoute
                   ? "bg-primary text-primary-content"
                   : "hover:bg-base-200 text-base-content/70 hover:text-base-content"
               }
@@ -55,7 +56,7 @@ function Navbar() {
             to={"/dashboard"}
             className={`px-4 py-2.5 rounded-lg transition-all duration-200 
               ${
-                isActive("/dashboard")
+                isDashboardRoute
                   ? "bg-primary text-primary-content"
                   : "hover:bg-base-200 text-base-content/70 hover:text-base-content"
               }

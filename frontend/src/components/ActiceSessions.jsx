@@ -6,12 +6,20 @@ import {
   UsersIcon,
   ZapIcon,
   LoaderIcon,
+  RefreshCcwIcon,
 } from "lucide-react";
 import { useMemo, useState } from "react";
 import { Link } from "react-router";
 import { getDifficultyBadgeClass } from "../lib/utils.js";
 
-function ActiveSessions({ sessions, isLoading, isUserInSession }) {
+function ActiveSessions({
+  sessions,
+  isLoading,
+  isRefreshing = false,
+  isError = false,
+  onRetry,
+  isUserInSession,
+}) {
   const [statusFilter, setStatusFilter] = useState("all");
 
   const activeCount = sessions.filter(
@@ -169,16 +177,29 @@ function ActiveSessions({ sessions, isLoading, isUserInSession }) {
                 <SparklesIcon className="w-10 h-10 text-primary/50" />
               </div>
               <p className="text-lg font-semibold opacity-70 mb-1">
-                No{" "}
-                {statusFilter === "all"
-                  ? "sessions"
-                  : statusFilter + " sessions"}
+                {isError
+                  ? "Failed to fetch sessions"
+                  : `No ${statusFilter === "all" ? "sessions" : statusFilter + " sessions"}`}
               </p>
               <p className="text-sm opacity-50">
-                {statusFilter === "all"
-                  ? "Be the first to create one!"
-                  : "Try switching the filter to see more sessions."}
+                {isError
+                  ? "Please try again to load live sessions."
+                  : statusFilter === "all"
+                    ? "Be the first to create one!"
+                    : "Try switching the filter to see more sessions."}
               </p>
+
+              <button
+                type="button"
+                className="btn btn-sm btn-primary mt-4"
+                onClick={onRetry}
+                disabled={isRefreshing}
+              >
+                <RefreshCcwIcon
+                  className={`size-4 ${isRefreshing ? "animate-spin" : ""}`}
+                />
+                {isError ? "Try Again" : "Refresh Sessions"}
+              </button>
             </div>
           )}
         </div>

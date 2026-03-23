@@ -1,16 +1,31 @@
-import { Code2, Clock, Users, Trophy, Loader } from "lucide-react";
+import {
+  Code2,
+  Clock,
+  Users,
+  Trophy,
+  Loader,
+  RefreshCcwIcon,
+} from "lucide-react";
 import { getDifficultyBadgeClass } from "../lib/utils.js";
 import { formatDistanceToNow } from "date-fns";
 
-function RecentSessions({ sessions, isLoading }) {
+function RecentSessions({
+  sessions,
+  isLoading,
+  isRefreshing = false,
+  isError = false,
+  onRetry,
+}) {
   return (
     <div className="card bg-base-100 border-2 border-accent/20 hover:border-accent/30 mt-8">
       <div className="card-body">
         <div className="flex items-center gap-3 mb-6">
-          <div className="p-2 bg-liner-to-br from-accent to-secondary rounded-xl">
-            <Clock className="w-5 h-5 text-white" />
+          <div className="flex items-center gap-3">
+            <div className="p-2 bg-liner-to-br from-accent to-secondary rounded-xl">
+              <Clock className="w-5 h-5 text-white" />
+            </div>
+            <h2 className="text-2xl font-black">Your Past Sessions</h2>
           </div>
-          <h2 className="text-2xl font-black">Your Past Sessions</h2>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -95,11 +110,25 @@ function RecentSessions({ sessions, isLoading }) {
                 <Trophy className="w-10 h-10 text-accent/50" />
               </div>
               <p className="text-lg font-semibold opacity-70 mb-1">
-                No sessions yet
+                {isError ? "Failed to fetch sessions" : "No sessions yet"}
               </p>
               <p className="text-sm opacity-50">
-                Start your coding journey today!
+                {isError
+                  ? "Please try again to load past sessions."
+                  : "Start your coding journey today!"}
               </p>
+
+              <button
+                type="button"
+                className="btn btn-sm btn-primary mt-4"
+                onClick={onRetry}
+                disabled={isRefreshing}
+              >
+                <RefreshCcwIcon
+                  className={`size-4 ${isRefreshing ? "animate-spin" : ""}`}
+                />
+                {isError ? "Try Again" : "Refresh Sessions"}
+              </button>
             </div>
           )}
         </div>

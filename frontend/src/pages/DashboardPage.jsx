@@ -27,11 +27,15 @@ function DashboardPage() {
   const {
     data: activeSessionsData,
     isLoading: loadingActiveSessions,
+    isRefetching: refetchingActiveSessions,
+    isError: activeSessionsError,
     refetch: refetchActiveSessions,
   } = useActiveSessions();
   const {
     data: recentSessionsData,
     isLoading: loadingRecentSessions,
+    isRefetching: refetchingRecentSessions,
+    isError: recentSessionsError,
     refetch: refetchRecentSessions,
   } = useMyRecentSessions();
 
@@ -106,6 +110,12 @@ function DashboardPage() {
     if (!createdSessionData?.sessionId) return;
 
     const sessionId = createdSessionData.sessionId;
+    if (createdSessionData?.password) {
+      sessionStorage.setItem(
+        `session-password-${sessionId}`,
+        createdSessionData.password,
+      );
+    }
     setCreatedSessionData(null);
     navigate(`/session/${sessionId}`);
   };
@@ -141,6 +151,9 @@ function DashboardPage() {
             <ActiveSessions
               sessions={activeSessions}
               isLoading={loadingActiveSessions}
+              isRefreshing={refetchingActiveSessions}
+              isError={activeSessionsError}
+              onRetry={refetchActiveSessions}
               isUserInSession={isUserInSession}
             />
           </div>
@@ -148,6 +161,9 @@ function DashboardPage() {
           <RecentSessions
             sessions={recentSessions}
             isLoading={loadingRecentSessions}
+            isRefreshing={refetchingRecentSessions}
+            isError={recentSessionsError}
+            onRetry={refetchRecentSessions}
           />
         </div>
       </div>

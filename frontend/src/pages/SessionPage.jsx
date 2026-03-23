@@ -11,7 +11,13 @@ import { executeCode } from "../lib/piston.js";
 import Navbar from "../components/Navbar.jsx";
 import { Panel, PanelGroup, PanelResizeHandle } from "react-resizable-panels";
 import { getDifficultyBadgeClass } from "../lib/utils.js";
-import { Loader2Icon, LogOutIcon, PhoneOffIcon } from "lucide-react";
+import {
+  EyeIcon,
+  EyeOffIcon,
+  Loader2Icon,
+  LogOutIcon,
+  PhoneOffIcon,
+} from "lucide-react";
 import CodeEditorPanel from "../components/CodeEditorPanel.jsx";
 import OutputPanel from "../components/OutputPanel.jsx";
 
@@ -26,6 +32,8 @@ function SessionPage() {
   const [output, setOutput] = useState(null);
   const [isRunning, setIsRunning] = useState(false);
   const [joinPassword, setJoinPassword] = useState("");
+  const [hostSessionPassword, setHostSessionPassword] = useState("");
+  const [showHostPassword, setShowHostPassword] = useState(false);
   const [hasVerifiedAccess, setHasVerifiedAccess] = useState(false);
   const [showEndSessionDialog, setShowEndSessionDialog] = useState(false);
 
@@ -43,6 +51,20 @@ function SessionPage() {
   const isParticipant = session?.participant?.clerkId === user?.id;
   const needsToJoin = !!session && !!user && !loadingSession && !isHost;
   const canEnterSession = isHost || hasVerifiedAccess;
+  const rawHostName = session?.host?.name?.trim();
+  const hostLooksLikeClerkId = rawHostName?.startsWith("user_");
+  const hostDisplayName = isHost
+    ? "You"
+    : rawHostName && !hostLooksLikeClerkId
+      ? rawHostName.split(" ")[0]
+      : "Host";
+  const difficultyLabel =
+    session?.difficulty?.toLowerCase() === "open"
+      ? "Freestyle"
+      : session?.difficulty
+        ? session.difficulty.slice(0, 1).toUpperCase() +
+          session.difficulty.slice(1)
+        : "Easy";
 
   const { call, channel, chatClient, isInitializingCall, streamClient } =
     useStreamClient(session, loadingSession, isHost, canEnterSession);
@@ -131,7 +153,20 @@ function SessionPage() {
   useEffect(() => {
     setHasVerifiedAccess(false);
     setJoinPassword("");
+    setHostSessionPassword("");
+    setShowHostPassword(false);
   }, [id]);
+
+  useEffect(() => {
+    if (!id || !isHost) {
+      setHostSessionPassword("");
+      return;
+    }
+
+    const savedPassword =
+      sessionStorage.getItem(`session-password-${id}`) || "";
+    setHostSessionPassword(savedPassword);
+  }, [id, isHost]);
 
   return (
     <div className="h-screen bg-base-100 flex flex-col">
@@ -147,11 +182,13 @@ function SessionPage() {
                 live session.
               </p>
 
-              <label className="form-control mt-2">
-                <span className="label-text font-medium mb-2">Password</span>
+              <label className="form-control mt-4">
+                <span className="label-text font-medium mb-3 block">
+                  Password
+                </span>
                 <input
                   type="text"
-                  className="input input-bordered w-full"
+                  className="input input-bordered w-full py-3"
                   value={joinPassword}
                   maxLength={8}
                   onChange={(e) => setJoinPassword(e.target.value)}
@@ -241,19 +278,49 @@ function SessionPage() {
                           </p>
                         )}
                         <p className="text-base-content/60 mt-2">
-                          Host: {session?.host?.name || "Loading..."} •{" "}
+                          Host: {session ? hostDisplayName : "Loading..."} •{" "}
                           {session?.participant ? 2 : 1}/2 participants
                         </p>
                       </div>
 
                       <div className="flex items-center gap-3">
+                        {isHost && hostSessionPassword && (
+                          <div className="flex items-center gap-2 bg-base-200 border border-base-300 rounded-lg px-2.5 py-1.5">
+                            <span className="text-xs font-medium text-base-content/70">
+                              Session Password:
+                            </span>
+                            <code className="text-sm font-bold tracking-wider min-w-20 text-base-content">
+                              {showHostPassword
+                                ? hostSessionPassword
+                                : "••••••••"}
+                            </code>
+                            <button
+                              type="button"
+                              className="btn btn-ghost btn-xs"
+                              onClick={() =>
+                                setShowHostPassword((prev) => !prev)
+                              }
+                              title={
+                                showHostPassword
+                                  ? "Hide password"
+                                  : "Show password"
+                              }
+                            >
+                              {showHostPassword ? (
+                                <EyeOffIcon className="w-4 h-4" />
+                              ) : (
+                                <EyeIcon className="w-4 h-4" />
+                              )}
+                            </button>
+                          </div>
+                        )}
+
                         <span
                           className={`badge badge-lg ${getDifficultyBadgeClass(
                             session?.difficulty,
                           )}`}
                         >
-                          {session?.difficulty.slice(0, 1).toUpperCase() +
-                            session?.difficulty.slice(1) || "Easy"}
+                          {difficultyLabel}
                         </span>
                         {isHost && session?.status === "active" && (
                           <button
