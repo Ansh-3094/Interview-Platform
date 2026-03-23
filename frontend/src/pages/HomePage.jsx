@@ -9,6 +9,7 @@ import {
   ZapIcon,
 } from "lucide-react";
 import { SignInButton } from "@clerk/clerk-react";
+import Footer from "../components/Footer";
 
 function HomePage() {
   return (
@@ -27,7 +28,7 @@ function HomePage() {
 
             <div className="flex flex-col">
               <span className="font-black text-xl bg-linear-to-r from-primary via-secondary to-accent bg-clip-text text-transparent font-mono tracking-wider">
-                NAMEEEE
+                InterviewApex
               </span>
               <span className="text-xs text-base-content/60 font-medium -mt-1">
                 Code Together
@@ -37,7 +38,7 @@ function HomePage() {
 
           {/* AUTH BTN */}
           <SignInButton mode="modal">
-            <button className="group px-6 py-3 bg-linear-to-rr from-primary to-secondary rounded-xl text-white font-semibold text-sm shadow-lg hover:shadow-xl transition-all duration-200 hover:scale-105 flex items-center gap-2 cursor-pointer">
+            <button className="group px-6 py-3 bg-linear-to-r from-primary via-secondary to-accent rounded-xl text-primary-content font-semibold text-sm shadow-lg hover:shadow-xl transition-all duration-200 hover:scale-105 flex items-center gap-2 cursor-pointer">
               <span>Get Started</span>
               <ArrowRightIcon className="size-4 group-hover:translate-x-0.5 transition-transform" />
             </button>
@@ -184,6 +185,74 @@ function HomePage() {
           </div>
         </div>
       </div>
+
+      {/* SUPPORTED LANGUAGES SECTION */}
+      <div className="max-w-7xl mx-auto px-4 py-20">
+        <div className="text-center mb-16">
+          <h2 className="text-4xl font-bold mb-4">
+            Supported <span className="text-primary font-mono">Languages</span>
+          </h2>
+          <p className="text-lg text-base-content/70 max-w-2xl mx-auto">
+            Practice coding interviews in your favorite programming languages
+          </p>
+        </div>
+
+        {/* LANGUAGES GRID */}
+        <div className="grid md:grid-cols-3 gap-8">
+          {/* Python */}
+          <div className="card bg-base-100 shadow-xl hover:shadow-2xl transition-shadow duration-300 overflow-hidden">
+            <figure className="h-48 bg-linear-to-br from-blue-500/10 to-yellow-500/10">
+              <img
+                src="/python.png"
+                alt="Python"
+                className="w-full h-full object-cover hover:scale-110 transition-transform duration-500"
+              />
+            </figure>
+            <div className="card-body items-center text-center">
+              <h3 className="card-title text-2xl">Python</h3>
+              <p className="text-base-content/70">
+                Popular for data structures and algorithms
+              </p>
+            </div>
+          </div>
+
+          {/* JavaScript */}
+          <div className="card bg-base-100 shadow-xl hover:shadow-2xl transition-shadow duration-300 overflow-hidden">
+            <figure className="h-48 bg-linear-to-br from-yellow-500/10 to-orange-500/10">
+              <img
+                src="/javascript.png"
+                alt="JavaScript"
+                className="w-full h-full object-cover hover:scale-110 transition-transform duration-500"
+              />
+            </figure>
+            <div className="card-body items-center text-center">
+              <h3 className="card-title text-2xl">JavaScript</h3>
+              <p className="text-base-content/70">
+                Essential for web development interviews
+              </p>
+            </div>
+          </div>
+
+          {/* Java */}
+          <div className="card bg-base-100 shadow-xl hover:shadow-2xl transition-shadow duration-300 overflow-hidden">
+            <figure className="h-48 bg-linear-to-br from-red-500/10 to-orange-500/10">
+              <img
+                src="/java.png"
+                alt="Java"
+                className="w-full h-full object-cover hover:scale-110 transition-transform duration-500"
+              />
+            </figure>
+            <div className="card-body items-center text-center">
+              <h3 className="card-title text-2xl">Java</h3>
+              <p className="text-base-content/70">
+                Industry standard for enterprise development
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <Footer />
     </div>
   );
 }
