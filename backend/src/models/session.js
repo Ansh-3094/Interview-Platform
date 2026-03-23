@@ -30,6 +30,11 @@ const sessionSchema = new mongoose.Schema(
       type: String,
       default: "",
     },
+    joinPasswordHash: {
+      type: String,
+      default: "",
+      select: false,
+    },
   },
   { timestamps: true },
 );

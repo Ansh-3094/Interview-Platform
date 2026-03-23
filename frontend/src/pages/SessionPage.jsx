@@ -25,6 +25,7 @@ function SessionPage() {
   const { user } = useUser();
   const [output, setOutput] = useState(null);
   const [isRunning, setIsRunning] = useState(false);
+  const [joinPassword, setJoinPassword] = useState("");
 
   const {
     data: sessionData,
@@ -38,6 +39,8 @@ function SessionPage() {
   const session = sessionData?.session;
   const isHost = session?.host?.clerkId === user?.id;
   const isParticipant = session?.participant?.clerkId === user?.id;
+  const needsToJoin =
+    !!session && !!user && !loadingSession && !isHost && !isParticipant;
 
   const { call, channel, chatClient, isInitializingCall, streamClient } =
     useStreamClient(session, loadingSession, isHost, isParticipant);
@@ -51,16 +54,6 @@ function SessionPage() {
   const [code, setCode] = useState(
     problemData?.starterCode?.[selectedLanguage] || "",
   );
-
-  // auto-join session if user is not already a participant and not the host
-  useEffect(() => {
-    if (!session || !user || loadingSession) return;
-    if (isHost || isParticipant) return;
-
-    joinSessionMutation.mutate(id, { onSuccess: refetch });
-
-    // remove the joinSessionMutation, refetch from dependencies to avoid infinite loop
-  }, [session, user, loadingSession, isHost, isParticipant, id]);
 
   // redirect the "participant" when session ends
   useEffect(() => {
@@ -107,9 +100,80 @@ function SessionPage() {
     }
   };
 
+  const handleJoinSession = () => {
+    if (joinPassword.trim().length !== 8) return;
+
+    joinSessionMutation.mutate(
+      {
+        id,
+        password: joinPassword.trim(),
+      },
+      {
+        onSuccess: () => {
+          setJoinPassword("");
+          refetch();
+        },
+      },
+    );
+  };
+
+  const handleCloseJoinDialog = () => {
+    setJoinPassword("");
+    navigate("/dashboard");
+  };
+
   return (
     <div className="h-screen bg-base-100 flex flex-col">
       <Navbar />
+
+      {needsToJoin && session?.status === "active" && (
+        <div className="fixed inset-0 z-50 bg-black/50 flex items-center justify-center p-4">
+          <div className="w-full max-w-md card bg-base-100 shadow-2xl">
+            <div className="card-body">
+              <h2 className="card-title text-2xl">Join Protected Session</h2>
+              <p className="text-base-content/70">
+                Enter the 8-character password shared by the host to join this
+                live session.
+              </p>
+
+              <label className="form-control mt-2">
+                <span className="label-text font-medium mb-2">Password</span>
+                <input
+                  type="text"
+                  className="input input-bordered w-full"
+                  value={joinPassword}
+                  maxLength={8}
+                  onChange={(e) => setJoinPassword(e.target.value)}
+                  placeholder="Enter session password"
+                />
+              </label>
+
+              <div className="card-actions justify-end mt-4">
+                <button
+                  className="btn btn-ghost"
+                  onClick={handleCloseJoinDialog}
+                  disabled={joinSessionMutation.isPending}
+                >
+                  Close
+                </button>
+                <button
+                  className="btn btn-primary"
+                  onClick={handleJoinSession}
+                  disabled={
+                    joinSessionMutation.isPending ||
+                    joinPassword.trim().length !== 8
+                  }
+                >
+                  {joinSessionMutation.isPending ? (
+                    <Loader2Icon className="w-4 h-4 animate-spin" />
+                  ) : null}
+                  Join Session
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
 
       <div className="flex-1">
         <PanelGroup direction="horizontal">

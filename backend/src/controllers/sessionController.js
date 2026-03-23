@@ -1,6 +1,25 @@
 import Session from "../models/session.js";
 import { StreamChat } from "stream-chat";
 import { chatClient, streamClient } from "../lib/stream.js";
+import crypto from "crypto";
+
+const PASSWORD_LENGTH = 8;
+
+function generateSessionPassword(length = PASSWORD_LENGTH) {
+  const chars = "ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz23456789";
+  const randomBytes = crypto.randomBytes(length);
+  let password = "";
+
+  for (let i = 0; i < length; i++) {
+    password += chars[randomBytes[i] % chars.length];
+  }
+
+  return password;
+}
+
+function hashSessionPassword(password) {
+  return crypto.createHash("sha256").update(password).digest("hex");
+}
 
 export async function createSession(req, res) {
   try {
@@ -16,6 +35,8 @@ export async function createSession(req, res) {
 
     //Generate a unique call id for stream video
     const callId = `session_${Date.now()}_${Math.random().toString(36).substring(7)}`;
+    const sessionPassword = generateSessionPassword();
+    const joinPasswordHash = hashSessionPassword(sessionPassword);
 
     //This creates session in DB
     const session = await Session.create({
@@ -23,6 +44,7 @@ export async function createSession(req, res) {
       difficulty,
       host: userId,
       callId,
+      joinPasswordHash,
     });
 
     //This creates stream video call
@@ -41,7 +63,11 @@ export async function createSession(req, res) {
       members: [clerkId],
     });
     await channel.create();
-    res.status(201).json({ session });
+
+    const safeSession = session.toObject();
+    delete safeSession.joinPasswordHash;
+
+    res.status(201).json({ session: safeSession, sessionPassword });
   } catch (error) {
     console.log("Error in createSession controller", error.message);
     res.status(500).json({
@@ -113,9 +139,10 @@ export async function getSessionById(req, res) {
 export async function joinSession(req, res) {
   try {
     const { id } = req.params;
+    const { password } = req.body;
     const userId = req.user._id;
     const clerkId = req.user.clerkId;
-    const session = await Session.findById(id);
+    const session = await Session.findById(id).select("+joinPasswordHash");
 
     if (!session) {
       return res.status(404).json({ message: "Session not found" });
@@ -125,6 +152,21 @@ export async function joinSession(req, res) {
       return res
         .status(400)
         .json({ message: "Cannot join a completed Session" });
+    }
+
+    if (!password || typeof password !== "string" || password.length !== 8) {
+      return res
+        .status(400)
+        .json({ message: "Valid 8-character password is required" });
+    }
+
+    const submittedPasswordHash = hashSessionPassword(password.trim());
+    if (!session.joinPasswordHash) {
+      return res.status(400).json({ message: "This session is not joinable" });
+    }
+
+    if (submittedPasswordHash !== session.joinPasswordHash) {
+      return res.status(401).json({ message: "Incorrect session password" });
     }
 
     if (session.host.toString() === userId.toString()) {
@@ -145,7 +187,10 @@ export async function joinSession(req, res) {
     const channel = chatClient.channel("messaging", session.callId);
     await channel.addMembers([clerkId]);
 
-    res.status(200).json({ session });
+    const safeSession = session.toObject();
+    delete safeSession.joinPasswordHash;
+
+    res.status(200).json({ session: safeSession });
   } catch (error) {
     console.log("Error in joinSession controllers", error.message);
     res.status(500).json({

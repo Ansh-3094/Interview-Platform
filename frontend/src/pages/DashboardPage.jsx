@@ -19,6 +19,7 @@ function DashboardPage() {
   const navigate = useNavigate();
   const { user } = useUser();
   const [showCreateModal, setShowCreateModal] = useState(false);
+  const [createdSessionData, setCreatedSessionData] = useState(null);
   const [roomConfig, setRoomConfig] = useState({ problem: "", difficulty: "" });
 
   const createSessionMutation = useCreateSession();
@@ -39,6 +40,8 @@ function DashboardPage() {
       {
         onSuccess: (data) => {
           const nestedSession = data?.session || data?.data?.session;
+          const generatedPassword =
+            data?.sessionPassword || data?.data?.sessionPassword;
           const sessionId =
             nestedSession?._id ||
             nestedSession?.id ||
@@ -57,10 +60,38 @@ function DashboardPage() {
 
           toast.success("Session created successfully!");
           setShowCreateModal(false);
+
+          if (generatedPassword) {
+            setCreatedSessionData({
+              sessionId,
+              password: generatedPassword,
+            });
+            return;
+          }
+
           navigate(`/session/${sessionId}`);
         },
       },
     );
+  };
+
+  const handleCopyPassword = async () => {
+    if (!createdSessionData?.password) return;
+
+    try {
+      await navigator.clipboard.writeText(createdSessionData.password);
+      toast.success("Password copied");
+    } catch {
+      toast.error("Failed to copy password");
+    }
+  };
+
+  const handleContinueToSession = () => {
+    if (!createdSessionData?.sessionId) return;
+
+    const sessionId = createdSessionData.sessionId;
+    setCreatedSessionData(null);
+    navigate(`/session/${sessionId}`);
   };
 
   const activeSessions = activeSessionsData?.sessions || [];
@@ -110,6 +141,41 @@ function DashboardPage() {
         onCreateRoom={handleCreateRoom}
         isCreating={createSessionMutation.isPending}
       />
+
+      {createdSessionData && (
+        <div className="modal modal-open">
+          <div className="modal-box max-w-lg">
+            <h3 className="font-bold text-2xl mb-3">Session Password</h3>
+            <p className="text-base-content/70 mb-5">
+              Share this password with the participant. They must enter this to
+              join your live session.
+            </p>
+
+            <div className="bg-base-200 rounded-xl p-4 mb-5 border border-base-300">
+              <p className="text-sm opacity-70 mb-2">8-character password</p>
+              <p className="text-2xl font-black tracking-wider">
+                {createdSessionData.password}
+              </p>
+            </div>
+
+            <div className="modal-action">
+              <button className="btn btn-ghost" onClick={handleCopyPassword}>
+                Copy Password
+              </button>
+              <button
+                className="btn btn-primary"
+                onClick={handleContinueToSession}
+              >
+                Continue to Session
+              </button>
+            </div>
+          </div>
+          <div
+            className="modal-backdrop"
+            onClick={handleContinueToSession}
+          ></div>
+        </div>
+      )}
     </>
   );
 }

@@ -86,7 +86,7 @@ function CreateSessionModal({
               <PlusIcon className="size-5" />
             )}
 
-            {isCreating ? "Creating..." : "Create"}
+            {isCreating ? "Creating..." : "Create Session Now"}
           </button>
         </div>
       </div>
