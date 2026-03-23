@@ -1,6 +1,6 @@
 import { useNavigate } from "react-router";
 import { useUser } from "@clerk/clerk-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 import {
   useActiveSessions,
@@ -24,10 +24,26 @@ function DashboardPage() {
 
   const createSessionMutation = useCreateSession();
 
-  const { data: activeSessionsData, isLoading: loadingActiveSessions } =
-    useActiveSessions();
-  const { data: recentSessionsData, isLoading: loadingRecentSessions } =
-    useMyRecentSessions();
+  const {
+    data: activeSessionsData,
+    isLoading: loadingActiveSessions,
+    refetch: refetchActiveSessions,
+  } = useActiveSessions();
+  const {
+    data: recentSessionsData,
+    isLoading: loadingRecentSessions,
+    refetch: refetchRecentSessions,
+  } = useMyRecentSessions();
+
+  useEffect(() => {
+    const handleFocus = () => {
+      refetchActiveSessions();
+      refetchRecentSessions();
+    };
+
+    window.addEventListener("focus", handleFocus);
+    return () => window.removeEventListener("focus", handleFocus);
+  }, [refetchActiveSessions, refetchRecentSessions]);
 
   const handleCreateRoom = () => {
     if (!roomConfig.problem || !roomConfig.difficulty) return;
@@ -95,6 +111,9 @@ function DashboardPage() {
   };
 
   const activeSessions = activeSessionsData?.sessions || [];
+  const activeOnlySessions = activeSessions.filter(
+    (session) => session.status === "active",
+  );
   const recentSessions = recentSessionsData?.sessions || [];
 
   const isUserInSession = (session) => {
@@ -116,7 +135,7 @@ function DashboardPage() {
         <div className="container mx-auto px-6 pb-16">
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
             <StatsCards
-              activeSessionsCount={activeSessions.length}
+              activeSessionsCount={activeOnlySessions.length}
               recentSessionsCount={recentSessions.length}
             />
             <ActiveSessions

@@ -26,6 +26,8 @@ function SessionPage() {
   const [output, setOutput] = useState(null);
   const [isRunning, setIsRunning] = useState(false);
   const [joinPassword, setJoinPassword] = useState("");
+  const [hasVerifiedAccess, setHasVerifiedAccess] = useState(false);
+  const [showEndSessionDialog, setShowEndSessionDialog] = useState(false);
 
   const {
     data: sessionData,
@@ -39,11 +41,11 @@ function SessionPage() {
   const session = sessionData?.session;
   const isHost = session?.host?.clerkId === user?.id;
   const isParticipant = session?.participant?.clerkId === user?.id;
-  const needsToJoin =
-    !!session && !!user && !loadingSession && !isHost && !isParticipant;
+  const needsToJoin = !!session && !!user && !loadingSession && !isHost;
+  const canEnterSession = isHost || hasVerifiedAccess;
 
   const { call, channel, chatClient, isInitializingCall, streamClient } =
-    useStreamClient(session, loadingSession, isHost, isParticipant);
+    useStreamClient(session, loadingSession, isHost, canEnterSession);
 
   // find the problem data based on session problem title
   const problemData = session?.problem
@@ -88,16 +90,19 @@ function SessionPage() {
   };
 
   const handleEndSession = () => {
-    if (
-      confirm(
-        "Are you sure you want to end this session? All participants will be notified.",
-      )
-    ) {
-      // this will navigate the HOST to dashboard
-      endSessionMutation.mutate(id, {
-        onSuccess: () => navigate("/dashboard"),
-      });
-    }
+    setShowEndSessionDialog(true);
+  };
+
+  const handleConfirmEndSession = () => {
+    // this will navigate the HOST to dashboard
+    endSessionMutation.mutate(id, {
+      onSuccess: () => navigate("/dashboard"),
+    });
+  };
+
+  const handleCancelEndSession = () => {
+    if (endSessionMutation.isPending) return;
+    setShowEndSessionDialog(false);
   };
 
   const handleJoinSession = () => {
@@ -111,6 +116,7 @@ function SessionPage() {
       {
         onSuccess: () => {
           setJoinPassword("");
+          setHasVerifiedAccess(true);
           refetch();
         },
       },
@@ -122,11 +128,16 @@ function SessionPage() {
     navigate("/dashboard");
   };
 
+  useEffect(() => {
+    setHasVerifiedAccess(false);
+    setJoinPassword("");
+  }, [id]);
+
   return (
     <div className="h-screen bg-base-100 flex flex-col">
       <Navbar />
 
-      {needsToJoin && session?.status === "active" && (
+      {needsToJoin && session?.status === "active" && !canEnterSession && (
         <div className="fixed inset-0 z-50 bg-black/50 flex items-center justify-center p-4">
           <div className="w-full max-w-md card bg-base-100 shadow-2xl">
             <div className="card-body">
@@ -168,6 +179,40 @@ function SessionPage() {
                     <Loader2Icon className="w-4 h-4 animate-spin" />
                   ) : null}
                   Join Session
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {showEndSessionDialog && (
+        <div className="fixed inset-0 z-50 bg-black/50 flex items-center justify-center p-4">
+          <div className="w-full max-w-md card bg-base-100 shadow-2xl">
+            <div className="card-body">
+              <h2 className="card-title text-2xl">End Session?</h2>
+              <p className="text-base-content/70">
+                Are you sure you want to end this session? All participants will
+                be notified.
+              </p>
+
+              <div className="card-actions justify-end mt-4">
+                <button
+                  className="btn btn-ghost"
+                  onClick={handleCancelEndSession}
+                  disabled={endSessionMutation.isPending}
+                >
+                  Cancel
+                </button>
+                <button
+                  className="btn btn-error"
+                  onClick={handleConfirmEndSession}
+                  disabled={endSessionMutation.isPending}
+                >
+                  {endSessionMutation.isPending ? (
+                    <Loader2Icon className="w-4 h-4 animate-spin" />
+                  ) : null}
+                  End Session
                 </button>
               </div>
             </div>

@@ -7,10 +7,31 @@ import {
   ZapIcon,
   LoaderIcon,
 } from "lucide-react";
+import { useMemo, useState } from "react";
 import { Link } from "react-router";
 import { getDifficultyBadgeClass } from "../lib/utils.js";
 
 function ActiveSessions({ sessions, isLoading, isUserInSession }) {
+  const [statusFilter, setStatusFilter] = useState("all");
+
+  const activeCount = sessions.filter(
+    (session) => session.status === "active",
+  ).length;
+  const completedCount = sessions.filter(
+    (session) => session.status === "completed",
+  ).length;
+  const filteredSessions = useMemo(() => {
+    if (statusFilter === "active") {
+      return sessions.filter((session) => session.status === "active");
+    }
+
+    if (statusFilter === "completed") {
+      return sessions.filter((session) => session.status === "completed");
+    }
+
+    return sessions;
+  }, [sessions, statusFilter]);
+
   return (
     <div className="lg:col-span-2 card bg-base-100 border-2 border-primary/20 hover:border-primary/30 h-full">
       <div className="card-body">
@@ -27,9 +48,36 @@ function ActiveSessions({ sessions, isLoading, isUserInSession }) {
           <div className="flex items-center gap-2">
             <div className="size-2 bg-success rounded-full" />
             <span className="text-sm font-medium text-success">
-              {sessions.length} active
+              {activeCount} active • {completedCount} completed
             </span>
           </div>
+        </div>
+
+        <div className="mb-4 flex items-center gap-2">
+          <button
+            className={`btn btn-xs sm:btn-sm ${
+              statusFilter === "all" ? "btn-primary" : "btn-ghost"
+            }`}
+            onClick={() => setStatusFilter("all")}
+          >
+            All ({sessions.length})
+          </button>
+          <button
+            className={`btn btn-xs sm:btn-sm ${
+              statusFilter === "active" ? "btn-primary" : "btn-ghost"
+            }`}
+            onClick={() => setStatusFilter("active")}
+          >
+            Active ({activeCount})
+          </button>
+          <button
+            className={`btn btn-xs sm:btn-sm ${
+              statusFilter === "completed" ? "btn-primary" : "btn-ghost"
+            }`}
+            onClick={() => setStatusFilter("completed")}
+          >
+            Completed ({completedCount})
+          </button>
         </div>
 
         {/* SESSIONS LIST */}
@@ -38,8 +86,8 @@ function ActiveSessions({ sessions, isLoading, isUserInSession }) {
             <div className="flex items-center justify-center py-20">
               <LoaderIcon className="size-10 animate-spin text-primary" />
             </div>
-          ) : sessions.length > 0 ? (
-            sessions.map((session) => (
+          ) : filteredSessions.length > 0 ? (
+            filteredSessions.map((session) => (
               <div
                 key={session._id}
                 className="card bg-base-200 border-2 border-base-300 hover:border-primary/50"
@@ -80,7 +128,11 @@ function ActiveSessions({ sessions, isLoading, isUserInSession }) {
                             {session.participant ? "2/2" : "1/2"}
                           </span>
                         </div>
-                        {session.participant && !isUserInSession(session) ? (
+                        {session.status === "completed" ? (
+                          <span className="badge badge-ghost badge-sm">
+                            COMPLETED
+                          </span>
+                        ) : session.participant && !isUserInSession(session) ? (
                           <span className="badge badge-error badge-sm">
                             FULL
                           </span>
@@ -93,7 +145,11 @@ function ActiveSessions({ sessions, isLoading, isUserInSession }) {
                     </div>
                   </div>
 
-                  {session.participant && !isUserInSession(session) ? (
+                  {session.status === "completed" ? (
+                    <button className="btn btn-disabled btn-sm">
+                      Completed
+                    </button>
+                  ) : session.participant && !isUserInSession(session) ? (
                     <button className="btn btn-disabled btn-sm">Full</button>
                   ) : (
                     <Link
@@ -113,9 +169,16 @@ function ActiveSessions({ sessions, isLoading, isUserInSession }) {
                 <SparklesIcon className="w-10 h-10 text-primary/50" />
               </div>
               <p className="text-lg font-semibold opacity-70 mb-1">
-                No active sessions
+                No{" "}
+                {statusFilter === "all"
+                  ? "sessions"
+                  : statusFilter + " sessions"}
               </p>
-              <p className="text-sm opacity-50">Be the first to create one!</p>
+              <p className="text-sm opacity-50">
+                {statusFilter === "all"
+                  ? "Be the first to create one!"
+                  : "Try switching the filter to see more sessions."}
+              </p>
             </div>
           )}
         </div>

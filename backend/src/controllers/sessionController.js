@@ -78,12 +78,14 @@ export async function createSession(req, res) {
 
 export async function getActiveSessions(_, res) {
   try {
-    const sessions = await Session.find({ status: "active" })
+    const sessions = await Session.find({
+      status: { $in: ["active", "completed"] },
+    })
       //populate() replace a referenced ObjectId with actual document data from another collection.
       .populate("host", "name profileImage email clerkId")
       .populate("participant", "name profileImage email clerkId")
       .sort({ createdAt: -1 })
-      .limit(20);
+      .limit(50);
 
     res.status(200).json({ sessions });
   } catch (error) {
@@ -175,17 +177,23 @@ export async function joinSession(req, res) {
         .json({ message: "Host connot join their own session as participant" });
     }
 
-    //Check if session is already full - has a participant. Maximum of only 2 people can join the Meeting/Interview.
-    if (session.participant) {
+    // If another participant already occupies the seat, block join.
+    if (
+      session.participant &&
+      session.participant.toString() !== userId.toString()
+    ) {
       return res.status(409).json({ message: "Session is full" });
     }
 
-    session.participant = userId;
-    await session.save();
+    // Existing participant can re-verify password and rejoin.
+    if (!session.participant) {
+      session.participant = userId;
+      await session.save();
 
-    //Add this user to stream chat to ch  at
-    const channel = chatClient.channel("messaging", session.callId);
-    await channel.addMembers([clerkId]);
+      //Add this user to stream chat
+      const channel = chatClient.channel("messaging", session.callId);
+      await channel.addMembers([clerkId]);
+    }
 
     const safeSession = session.toObject();
     delete safeSession.joinPasswordHash;

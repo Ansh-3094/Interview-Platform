@@ -1,4 +1,5 @@
 import { useMutation, useQuery } from "@tanstack/react-query";
+import { useAuth } from "@clerk/clerk-react";
 import toast from "react-hot-toast";
 import { sessionApi } from "../api/sessions.js";
 
@@ -13,17 +14,29 @@ export const useCreateSession = () => {
 };
 
 export const useActiveSessions = () => {
+  const { isLoaded, isSignedIn } = useAuth();
+
   const result = useQuery({
     queryKey: ["activeSessions"],
     queryFn: sessionApi.getActiveSessions,
+    enabled: isLoaded && !!isSignedIn,
+    retry: 2,
+    retryDelay: 1000,
+    refetchOnWindowFocus: true,
   });
   return result;
 };
 
 export const useMyRecentSessions = () => {
+  const { isLoaded, isSignedIn } = useAuth();
+
   const result = useQuery({
     queryKey: ["myRecentSessions"],
     queryFn: sessionApi.getMyRecentSessions,
+    enabled: isLoaded && !!isSignedIn,
+    retry: 2,
+    retryDelay: 1000,
+    refetchOnWindowFocus: true,
   });
   return result;
 };
