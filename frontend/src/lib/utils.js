@@ -6,6 +6,8 @@ export const getDifficultyBadgeClass = (difficulty) => {
       return "badge-warning";
     case "hard":
       return "badge-error";
+    case "open":
+      return "badge-info";
     default:
       return "badge-ghost";
   }

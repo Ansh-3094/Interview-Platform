@@ -1,4 +1,54 @@
 export const PROBLEMS = {
+  "practice-freely": {
+    id: "practice-freely",
+    title: "Practice Freely",
+    difficulty: "Open",
+    category: "Open Practice • Sandbox",
+    mode: "freestyle",
+    description: {
+      text: "Use this space to practice any coding idea you want. There are no predefined test cases or expected outputs in this mode.",
+      notes: [
+        "Choose a language, write your code, and run it to see real execution output.",
+        "This mode is perfect for revising syntax, trying algorithms, or preparing custom interview questions.",
+      ],
+    },
+    practiceIdeas: [
+      "Implement stack, queue, or linked list from scratch.",
+      "Solve a custom recursion or dynamic programming problem.",
+      "Practice string parsing and edge-case handling.",
+      "Try your own mock interview question and validate with print statements.",
+    ],
+    examples: [],
+    constraints: [],
+    starterCode: {
+      javascript: `// Freestyle mode: practice anything you want.
+// Example:
+// function solve() {
+//   console.log("Hello, InterviewApex!");
+// }
+// solve();
+
+`,
+      python: `# Freestyle mode: practice anything you want.
+# Example:
+# def solve():
+#     print("Hello, InterviewApex!")
+#
+# solve()
+
+`,
+      java: `// Freestyle mode: practice anything you want.
+// Example:
+// class Main {
+//     public static void main(String[] args) {
+//         System.out.println("Hello, InterviewApex!");
+//     }
+// }
+
+`,
+    },
+  },
+
   "two-sum": {
     id: "two-sum",
     title: "Two Sum",

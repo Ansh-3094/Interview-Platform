@@ -2,8 +2,10 @@ import Session from "../models/session.js";
 import { StreamChat } from "stream-chat";
 import { chatClient, streamClient } from "../lib/stream.js";
 import crypto from "crypto";
+import { ENV } from "../lib/env.js";
 
 const PASSWORD_LENGTH = 8;
+const ALLOWED_DIFFICULTIES = new Set(["easy", "medium", "hard", "open"]);
 
 function generateSessionPassword(length = PASSWORD_LENGTH) {
   const chars = "ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz23456789";
@@ -23,14 +25,28 @@ function hashSessionPassword(password) {
 
 export async function createSession(req, res) {
   try {
+    if (!ENV.STREAM_API_KEY || !ENV.STREAM_API_SECRET) {
+      return res.status(500).json({
+        message:
+          "Session service is not configured. Missing STREAM_API_KEY or STREAM_API_SECRET.",
+      });
+    }
+
     const { problem, difficulty } = req.body;
     const userId = req.user._id;
     const clerkId = req.user.clerkId;
+    const normalizedDifficulty = String(difficulty || "").toLowerCase();
 
-    if (!problem || !difficulty) {
+    if (!problem || !normalizedDifficulty) {
       return res
         .status(400)
         .json({ message: "Problem and difficulty are required" });
+    }
+
+    if (!ALLOWED_DIFFICULTIES.has(normalizedDifficulty)) {
+      return res.status(400).json({
+        message: "Invalid difficulty. Allowed values: easy, medium, hard, open",
+      });
     }
 
     //Generate a unique call id for stream video
@@ -41,7 +57,7 @@ export async function createSession(req, res) {
     //This creates session in DB
     const session = await Session.create({
       problem,
-      difficulty,
+      difficulty: normalizedDifficulty,
       host: userId,
       callId,
       joinPasswordHash,
@@ -51,7 +67,11 @@ export async function createSession(req, res) {
     await streamClient.video.call("default", callId).getOrCreate({
       data: {
         created_by_id: clerkId,
-        custom: { problem, difficulty, sessionId: session._id.toString() },
+        custom: {
+          problem,
+          difficulty: normalizedDifficulty,
+          sessionId: session._id.toString(),
+        },
       },
     });
 
