@@ -12,6 +12,8 @@ import { SignInButton } from "@clerk/clerk-react";
 import Footer from "../components/Footer";
 
 function HomePage() {
+  const assetBase = import.meta.env.BASE_URL;
+
   return (
     <div className="bg-linear-to-r from-base-100 via-base-200 to-base-300">
       {/* NAVBAR */}
@@ -120,7 +122,7 @@ function HomePage() {
 
           {/* RIGHT IMAGE */}
           <img
-            src="/hero.png"
+            src={`${assetBase}hero.png`}
             alt="CodeCollab Platform"
             className="w-full h-auto rounded-3xl shadow-2xl border-4 border-base-100 hover:scale-105 transition-transform duration-500"
           />
@@ -203,7 +205,7 @@ function HomePage() {
           <div className="card bg-base-100 shadow-xl hover:shadow-2xl transition-shadow duration-300 overflow-hidden">
             <figure className="h-48 bg-linear-to-br from-blue-500/10 to-yellow-500/10">
               <img
-                src="/python.png"
+                src={`${assetBase}python.png`}
                 alt="Python"
                 className="w-full h-full object-cover hover:scale-110 transition-transform duration-500"
               />
@@ -220,7 +222,7 @@ function HomePage() {
           <div className="card bg-base-100 shadow-xl hover:shadow-2xl transition-shadow duration-300 overflow-hidden">
             <figure className="h-48 bg-linear-to-br from-yellow-500/10 to-orange-500/10">
               <img
-                src="/javascript.png"
+                src={`${assetBase}javascript.png`}
                 alt="JavaScript"
                 className="w-full h-full object-cover hover:scale-110 transition-transform duration-500"
               />
@@ -237,7 +239,7 @@ function HomePage() {
           <div className="card bg-base-100 shadow-xl hover:shadow-2xl transition-shadow duration-300 overflow-hidden">
             <figure className="h-48 bg-linear-to-br from-red-500/10 to-orange-500/10">
               <img
-                src="/java.png"
+                src={`${assetBase}java.png`}
                 alt="Java"
                 className="w-full h-full object-cover hover:scale-110 transition-transform duration-500"
               />
