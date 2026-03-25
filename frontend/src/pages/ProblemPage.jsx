@@ -1,12 +1,12 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router";
-import { PROBLEMS } from "../data/problems.js";
 import Navbar from "../components/Navbar.jsx";
 import { Panel, PanelGroup, PanelResizeHandle } from "react-resizable-panels";
 import ProblemDescription from "../components/ProblemDescription.jsx";
 import OutputPanel from "../components/OutputPanel.jsx";
 import CodeEditorPanel from "../components/CodeEditorPanel.jsx";
 import { executeCode } from "../lib/piston.js";
+import { useProblems } from "../hooks/useProblems.js";
 
 import toast from "react-hot-toast";
 import confetti from "canvas-confetti";
@@ -14,31 +14,55 @@ import confetti from "canvas-confetti";
 function ProblemPage() {
   const { id } = useParams();
   const navigate = useNavigate();
+  const { data: problemsData, isLoading, isError } = useProblems();
 
-  const [currentProblemId, setCurrentProblemId] = useState("two-sum");
+  const problemsMap = problemsData?.problems || {};
+  const hasProblems = Object.keys(problemsMap).length > 0;
+
+  const [currentProblemId, setCurrentProblemId] = useState("practice-freely");
   const [selectedLanguage, setSelectedLanguage] = useState("javascript");
-  const [code, setCode] = useState(
-    PROBLEMS[currentProblemId].starterCode.javascript,
-  );
+  const [code, setCode] = useState("");
   const [output, setOutput] = useState(null);
   const [isRunning, setIsRunning] = useState(false);
 
-  const currentProblem = PROBLEMS[currentProblemId];
+  const orderedProblems = Object.values(problemsMap).sort((a, b) => {
+    if (a.id === "practice-freely") return -1;
+    if (b.id === "practice-freely") return 1;
+    return a.title.localeCompare(b.title);
+  });
+
+  const currentProblem = problemsMap[currentProblemId];
   const isFreestyle = currentProblem?.mode === "freestyle";
 
-  // This updates problem when URL param changes(If user chooses different problem from two sum to reverse string)
+  // Sync current problem id with route and loaded API data.
   useEffect(() => {
-    if (id && PROBLEMS[id]) {
+    if (!hasProblems) return;
+
+    if (id && problemsMap[id]) {
       setCurrentProblemId(id);
-      setCode(PROBLEMS[id].starterCode[selectedLanguage]);
       setOutput(null);
+      return;
     }
-  }, [id, selectedLanguage]);
+
+    const fallbackId = orderedProblems[0]?.id;
+    if (fallbackId) {
+      setCurrentProblemId(fallbackId);
+      if (id !== fallbackId) {
+        navigate(`/problem/${fallbackId}`, { replace: true });
+      }
+    }
+  }, [id, hasProblems, problemsMap, orderedProblems, navigate]);
+
+  useEffect(() => {
+    if (!currentProblem?.starterCode) return;
+
+    setCode(currentProblem.starterCode[selectedLanguage] || "");
+  }, [currentProblem, selectedLanguage]);
 
   const handleLanguageChange = (e) => {
     const newLang = e.target.value;
     setSelectedLanguage(newLang);
-    setCode(currentProblem.starterCode[newLang]);
+    setCode(currentProblem?.starterCode?.[newLang] || "");
     setOutput(null);
   };
 
@@ -85,6 +109,8 @@ function ProblemPage() {
   };
 
   const handleRunCode = async () => {
+    if (!currentProblem) return;
+
     setIsRunning(true);
     setOutput(null);
 
@@ -111,12 +137,35 @@ function ProblemPage() {
         triggerConfetti();
         toast.success("All tests passed! Great job!");
       } else {
-        toast("Code ran, but output does not match expected result.");
+        toast.success("Code ran, but output does not match expected result.");
       }
     } else {
       toast.error("Code execution failed!");
     }
   };
+
+  if (isLoading) {
+    return (
+      <div className="h-screen bg-base-100 flex flex-col">
+        <Navbar />
+        <div className="flex-1 flex items-center justify-center text-base-content/70">
+          Loading problems...
+        </div>
+      </div>
+    );
+  }
+
+  if (isError || !currentProblem) {
+    return (
+      <div className="h-screen bg-base-100 flex flex-col">
+        <Navbar />
+        <div className="flex-1 flex items-center justify-center text-error">
+          Failed to load problem details.
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="h-screen bg-base-100 flex flex-col">
       <Navbar />
@@ -130,7 +179,7 @@ function ProblemPage() {
               isFreestyle={isFreestyle}
               currentProblemId={currentProblemId}
               onProblemChange={handleProblemChange}
-              allProblems={Object.values(PROBLEMS)}
+              allProblems={orderedProblems}
             />
           </Panel>
 

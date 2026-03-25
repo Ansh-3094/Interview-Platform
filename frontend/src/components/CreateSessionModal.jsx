@@ -1,5 +1,5 @@
 import { Code2Icon, LoaderIcon, PlusIcon } from "lucide-react";
-import { PROBLEMS } from "../data/problems.js";
+import { useProblems } from "../hooks/useProblems.js";
 
 function CreateSessionModal({
   isOpen,
@@ -9,7 +9,14 @@ function CreateSessionModal({
   onCreateRoom,
   isCreating,
 }) {
-  const problems = Object.values(PROBLEMS);
+  const { data: problemsData } = useProblems();
+  const problemsMap = problemsData?.problems || {};
+
+  const problems = Object.values(problemsMap).sort((a, b) => {
+    if (a.id === "practice-freely") return -1;
+    if (b.id === "practice-freely") return 1;
+    return a.title.localeCompare(b.title);
+  });
 
   if (!isOpen) return null;
 

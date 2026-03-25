@@ -6,7 +6,7 @@ import {
   useJoinSession,
   useSessionById,
 } from "../hooks/useSession.js";
-import { PROBLEMS } from "../data/problems.js";
+import { useProblems } from "../hooks/useProblems.js";
 import { executeCode } from "../lib/piston.js";
 import Navbar from "../components/Navbar.jsx";
 import { Panel, PanelGroup, PanelResizeHandle } from "react-resizable-panels";
@@ -42,6 +42,8 @@ function SessionPage() {
     isLoading: loadingSession,
     refetch,
   } = useSessionById(id);
+  const { data: problemsData } = useProblems();
+  const problemsMap = problemsData?.problems || {};
 
   const joinSessionMutation = useJoinSession();
   const endSessionMutation = useEndSession();
@@ -71,7 +73,7 @@ function SessionPage() {
 
   // find the problem data based on session problem title
   const problemData = session?.problem
-    ? Object.values(PROBLEMS).find((p) => p.title === session.problem)
+    ? Object.values(problemsMap).find((p) => p.title === session.problem)
     : null;
 
   const [selectedLanguage, setSelectedLanguage] = useState("javascript");
