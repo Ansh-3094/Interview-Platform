@@ -8,7 +8,9 @@ function Navbar() {
   const isProblemsRoute =
     location.pathname === "/problems" ||
     location.pathname.startsWith("/problem/");
-  const isDashboardRoute = location.pathname === "/dashboard";
+  const isDashboardRoute =
+    location.pathname === "/dashboard" ||
+    location.pathname.startsWith("/session/");
 
   return (
     <nav className="bg-base-100/80 backdrop-blur-md border-b border-primary/20 sticky top-0 z-50 shadow-lg">

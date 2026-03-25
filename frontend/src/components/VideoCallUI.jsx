@@ -5,7 +5,7 @@ import {
   useCallStateHooks,
 } from "@stream-io/video-react-sdk";
 import { Loader2Icon, MessageSquareIcon, UsersIcon, XIcon } from "lucide-react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router";
 import {
   Channel,
@@ -25,6 +25,30 @@ function VideoCallUI({ chatClient, channel }) {
   const callingState = useCallCallingState();
   const participantCount = useParticipantCount();
   const [isChatOpen, setIsChatOpen] = useState(false);
+  const [unreadCount, setUnreadCount] = useState(0);
+
+  useEffect(() => {
+    if (!channel) return;
+
+    const handleNewMessage = () => {
+      if (!isChatOpen) {
+        setUnreadCount((prev) => Math.min(prev + 1, 5));
+      }
+    };
+
+    channel.on("message.new", handleNewMessage);
+
+    return () => {
+      channel.off("message.new", handleNewMessage);
+    };
+  }, [channel, isChatOpen]);
+
+  const handleChatToggle = () => {
+    setIsChatOpen(!isChatOpen);
+    if (!isChatOpen) {
+      setUnreadCount(0);
+    }
+  };
 
   if (callingState === CallingState.JOINING) {
     return (
@@ -51,12 +75,17 @@ function VideoCallUI({ chatClient, channel }) {
           </div>
           {chatClient && channel && (
             <button
-              onClick={() => setIsChatOpen(!isChatOpen)}
-              className={`btn btn-sm gap-2 ${isChatOpen ? "btn-primary" : "btn-ghost"}`}
+              onClick={handleChatToggle}
+              className={`btn btn-sm gap-2 relative ${isChatOpen ? "btn-primary" : "btn-ghost"}`}
               title={isChatOpen ? "Hide chat" : "Show chat"}
             >
               <MessageSquareIcon className="size-4" />
               Chat
+              {unreadCount > 0 && (
+                <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">
+                  {unreadCount === 5 ? "5+" : unreadCount}
+                </span>
+              )}
             </button>
           )}
         </div>
