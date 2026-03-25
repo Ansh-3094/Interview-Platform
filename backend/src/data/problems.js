@@ -2633,4 +2633,944 @@ print(uniquePaths(3, 2))  # Expected: 3`,
       java: "28\n3",
     },
   },
+
+  "longest-repeating-character-replacement": {
+    id: "longest-repeating-character-replacement",
+    title: "Longest Repeating Character Replacement",
+    difficulty: "Medium",
+    category: "String • Sliding Window",
+    description: {
+      text: "Find the length of the longest substring with same letters after at most k replacements.",
+      notes: [],
+    },
+    examples: [
+      { input: 's="ABAB", k=2', output: "4" },
+      { input: 's="AABABBA", k=1', output: "4" },
+    ],
+    constraints: ["1 <= s.length <= 10^5"],
+    starterCode: {
+      javascript: `function characterReplacement(s, k) {
+  // Write your solution here
+}
+
+console.log(characterReplacement("ABAB", 2)); // Expected: 4
+console.log(characterReplacement("AABABBA", 1)); // Expected: 4`,
+      python: `def characterReplacement(s, k):
+    # Write your solution here
+    pass
+
+print(characterReplacement("ABAB", 2))  # Expected: 4
+print(characterReplacement("AABABBA", 1))  # Expected: 4`,
+      java: `class Solution {
+    public static int characterReplacement(String s, int k) {
+        // Write your solution here
+        return 0;
+    }
+
+    public static void main(String[] args) {
+        System.out.println(characterReplacement("ABAB", 2)); // Expected: 4
+        System.out.println(characterReplacement("AABABBA", 1)); // Expected: 4
+    }
+}`,
+    },
+    expectedOutput: {
+      javascript: "4\n4",
+      python: "4\n4",
+      java: "4\n4",
+    },
+  },
+
+  "permutation-in-string": {
+    id: "permutation-in-string",
+    title: "Permutation in String",
+    difficulty: "Medium",
+    category: "String • Sliding Window",
+    description: {
+      text: "Return true if s2 contains any permutation of s1 as a substring.",
+      notes: [],
+    },
+    examples: [
+      { input: 's1="ab", s2="eidbaooo"', output: "true" },
+      { input: 's1="ab", s2="eidboaoo"', output: "false" },
+    ],
+    constraints: ["1 <= s1.length, s2.length <= 10^4"],
+    starterCode: {
+      javascript: `function checkInclusion(s1, s2) {
+  // Write your solution here
+}
+
+console.log(checkInclusion("ab", "eidbaooo")); // Expected: true
+console.log(checkInclusion("ab", "eidboaoo")); // Expected: false`,
+      python: `def checkInclusion(s1, s2):
+    # Write your solution here
+    pass
+
+print(checkInclusion("ab", "eidbaooo"))  # Expected: True
+print(checkInclusion("ab", "eidboaoo"))  # Expected: False`,
+      java: `class Solution {
+    public static boolean checkInclusion(String s1, String s2) {
+        // Write your solution here
+        return false;
+    }
+
+    public static void main(String[] args) {
+        System.out.println(checkInclusion("ab", "eidbaooo")); // Expected: true
+        System.out.println(checkInclusion("ab", "eidboaoo")); // Expected: false
+    }
+}`,
+    },
+    expectedOutput: {
+      javascript: "true\nfalse",
+      python: "True\nFalse",
+      java: "true\nfalse",
+    },
+  },
+
+  "minimum-size-subarray-sum": {
+    id: "minimum-size-subarray-sum",
+    title: "Minimum Size Subarray Sum",
+    difficulty: "Medium",
+    category: "Array • Sliding Window • Two Pointers",
+    description: {
+      text: "Find the minimal length of a contiguous subarray with sum >= target.",
+      notes: ["Return 0 if there is no such subarray."],
+    },
+    examples: [
+      { input: "target=7, nums=[2,3,1,2,4,3]", output: "2" },
+      { input: "target=4, nums=[1,4,4]", output: "1" },
+    ],
+    constraints: ["1 <= nums.length <= 10^5"],
+    starterCode: {
+      javascript: `function minSubArrayLen(target, nums) {
+  // Write your solution here
+}
+
+console.log(minSubArrayLen(7, [2,3,1,2,4,3])); // Expected: 2
+console.log(minSubArrayLen(4, [1,4,4])); // Expected: 1`,
+      python: `def minSubArrayLen(target, nums):
+    # Write your solution here
+    pass
+
+print(minSubArrayLen(7, [2,3,1,2,4,3]))  # Expected: 2
+print(minSubArrayLen(4, [1,4,4]))  # Expected: 1`,
+      java: `class Solution {
+    public static int minSubArrayLen(int target, int[] nums) {
+        // Write your solution here
+        return 0;
+    }
+
+    public static void main(String[] args) {
+        System.out.println(minSubArrayLen(7, new int[]{2,3,1,2,4,3})); // Expected: 2
+        System.out.println(minSubArrayLen(4, new int[]{1,4,4})); // Expected: 1
+    }
+}`,
+    },
+    expectedOutput: {
+      javascript: "2\n1",
+      python: "2\n1",
+      java: "2\n1",
+    },
+  },
+
+  "two-sum-ii-input-array-is-sorted": {
+    id: "two-sum-ii-input-array-is-sorted",
+    title: "Two Sum II - Input Array Is Sorted",
+    difficulty: "Medium",
+    category: "Array • Two Pointers",
+    description: {
+      text: "Given sorted array numbers, find two numbers such that they add up to target.",
+      notes: ["Return 1-indexed positions."],
+    },
+    examples: [
+      { input: "numbers=[2,7,11,15], target=9", output: "[1,2]" },
+      { input: "numbers=[2,3,4], target=6", output: "[1,3]" },
+    ],
+    constraints: ["2 <= numbers.length <= 3*10^4"],
+    starterCode: {
+      javascript: `function twoSum(numbers, target) {
+  // Write your solution here
+}
+
+console.log(twoSum([2,7,11,15], 9)); // Expected: [1,2]
+console.log(twoSum([2,3,4], 6)); // Expected: [1,3]`,
+      python: `def twoSum(numbers, target):
+    # Write your solution here
+    pass
+
+print(twoSum([2,7,11,15], 9))  # Expected: [1,2]
+print(twoSum([2,3,4], 6))  # Expected: [1,3]`,
+      java: `import java.util.*;
+
+class Solution {
+    public static int[] twoSum(int[] numbers, int target) {
+        // Write your solution here
+        return new int[0];
+    }
+
+    public static void main(String[] args) {
+        System.out.println(Arrays.toString(twoSum(new int[]{2,7,11,15}, 9))); // Expected: [1, 2]
+        System.out.println(Arrays.toString(twoSum(new int[]{2,3,4}, 6))); // Expected: [1, 3]
+    }
+}`,
+    },
+    expectedOutput: {
+      javascript: "[1,2]\n[1,3]",
+      python: "[1, 2]\n[1, 3]",
+      java: "[1, 2]\n[1, 3]",
+    },
+  },
+
+  "move-zeroes": {
+    id: "move-zeroes",
+    title: "Move Zeroes",
+    difficulty: "Easy",
+    category: "Array • Two Pointers",
+    description: {
+      text: "Move all zeroes to the end while maintaining the relative order of non-zero elements.",
+      notes: [],
+    },
+    examples: [
+      { input: "nums=[0,1,0,3,12]", output: "[1,3,12,0,0]" },
+      { input: "nums=[0]", output: "[0]" },
+    ],
+    constraints: ["1 <= nums.length <= 10^4"],
+    starterCode: {
+      javascript: `function moveZeroes(nums) {
+  // Write your solution here
+  return nums;
+}
+
+console.log(moveZeroes([0,1,0,3,12])); // Expected: [1,3,12,0,0]
+console.log(moveZeroes([0])); // Expected: [0]`,
+      python: `def moveZeroes(nums):
+    # Write your solution here
+    return nums
+
+print(moveZeroes([0,1,0,3,12]))  # Expected: [1,3,12,0,0]
+print(moveZeroes([0]))  # Expected: [0]`,
+      java: `import java.util.*;
+
+class Solution {
+    public static int[] moveZeroes(int[] nums) {
+        // Write your solution here
+        return nums;
+    }
+
+    public static void main(String[] args) {
+        System.out.println(Arrays.toString(moveZeroes(new int[]{0,1,0,3,12}))); // Expected: [1, 3, 12, 0, 0]
+        System.out.println(Arrays.toString(moveZeroes(new int[]{0}))); // Expected: [0]
+    }
+}`,
+    },
+    expectedOutput: {
+      javascript: "[1,3,12,0,0]\n[0]",
+      python: "[1, 3, 12, 0, 0]\n[0]",
+      java: "[1, 3, 12, 0, 0]\n[0]",
+    },
+  },
+
+  "contains-duplicate": {
+    id: "contains-duplicate",
+    title: "Contains Duplicate",
+    difficulty: "Easy",
+    category: "Array • Hash Table",
+    description: {
+      text: "Return true if any value appears at least twice in the array.",
+      notes: [],
+    },
+    examples: [
+      { input: "nums=[1,2,3,1]", output: "true" },
+      { input: "nums=[1,2,3,4]", output: "false" },
+    ],
+    constraints: ["1 <= nums.length <= 10^5"],
+    starterCode: {
+      javascript: `function containsDuplicate(nums) {
+  // Write your solution here
+}
+
+console.log(containsDuplicate([1,2,3,1])); // Expected: true
+console.log(containsDuplicate([1,2,3,4])); // Expected: false`,
+      python: `def containsDuplicate(nums):
+    # Write your solution here
+    pass
+
+print(containsDuplicate([1,2,3,1]))  # Expected: True
+print(containsDuplicate([1,2,3,4]))  # Expected: False`,
+      java: `class Solution {
+    public static boolean containsDuplicate(int[] nums) {
+        // Write your solution here
+        return false;
+    }
+
+    public static void main(String[] args) {
+        System.out.println(containsDuplicate(new int[]{1,2,3,1})); // Expected: true
+        System.out.println(containsDuplicate(new int[]{1,2,3,4})); // Expected: false
+    }
+}`,
+    },
+    expectedOutput: {
+      javascript: "true\nfalse",
+      python: "True\nFalse",
+      java: "true\nfalse",
+    },
+  },
+
+  "group-anagrams": {
+    id: "group-anagrams",
+    title: "Group Anagrams",
+    difficulty: "Medium",
+    category: "Array • Hash Table",
+    description: {
+      text: "Group words that are anagrams of each other.",
+      notes: [],
+    },
+    examples: [
+      { input: 'strs=["eat","tea","tan","ate","nat","bat"]', output: "3" },
+      { input: 'strs=[""]', output: "1" },
+    ],
+    constraints: ["1 <= strs.length <= 10^4"],
+    starterCode: {
+      javascript: `function groupAnagrams(strs) {
+  // Write your solution here
+}
+
+console.log(groupAnagrams(["eat","tea","tan","ate","nat","bat"]).length); // Expected: 3
+console.log(groupAnagrams([""]).length); // Expected: 1`,
+      python: `def groupAnagrams(strs):
+    # Write your solution here
+    pass
+
+print(len(groupAnagrams(["eat","tea","tan","ate","nat","bat"])))  # Expected: 3
+print(len(groupAnagrams([""])))  # Expected: 1`,
+      java: `import java.util.*;
+
+class Solution {
+    public static List<List<String>> groupAnagrams(String[] strs) {
+        // Write your solution here
+        return new ArrayList<>();
+    }
+
+    public static void main(String[] args) {
+        System.out.println(groupAnagrams(new String[]{"eat","tea","tan","ate","nat","bat"}).size()); // Expected: 3
+        System.out.println(groupAnagrams(new String[]{""}).size()); // Expected: 1
+    }
+}`,
+    },
+    expectedOutput: {
+      javascript: "3\n1",
+      python: "3\n1",
+      java: "3\n1",
+    },
+  },
+
+  "top-k-frequent-elements": {
+    id: "top-k-frequent-elements",
+    title: "Top K Frequent Elements",
+    difficulty: "Medium",
+    category: "Array • Hash Table",
+    description: {
+      text: "Return the k most frequent elements.",
+      notes: [],
+    },
+    examples: [
+      { input: "nums=[1,1,1,2,2,3], k=2", output: "[1,2]" },
+      { input: "nums=[1], k=1", output: "[1]" },
+    ],
+    constraints: ["1 <= nums.length <= 10^5"],
+    starterCode: {
+      javascript: `function topKFrequent(nums, k) {
+  // Write your solution here
+}
+
+console.log(topKFrequent([1,1,1,2,2,3], 2)); // Expected: [1,2]
+console.log(topKFrequent([1], 1)); // Expected: [1]`,
+      python: `def topKFrequent(nums, k):
+    # Write your solution here
+    pass
+
+print(topKFrequent([1,1,1,2,2,3], 2))  # Expected: [1,2]
+print(topKFrequent([1], 1))  # Expected: [1]`,
+      java: `import java.util.*;
+
+class Solution {
+    public static int[] topKFrequent(int[] nums, int k) {
+        // Write your solution here
+        return new int[0];
+    }
+
+    public static void main(String[] args) {
+        System.out.println(Arrays.toString(topKFrequent(new int[]{1,1,1,2,2,3}, 2))); // Expected: [1, 2]
+        System.out.println(Arrays.toString(topKFrequent(new int[]{1}, 1))); // Expected: [1]
+    }
+}`,
+    },
+    expectedOutput: {
+      javascript: "[1,2]\n[1]",
+      python: "[1, 2]\n[1]",
+      java: "[1, 2]\n[1]",
+    },
+  },
+
+  "longest-consecutive-sequence": {
+    id: "longest-consecutive-sequence",
+    title: "Longest Consecutive Sequence",
+    difficulty: "Medium",
+    category: "Array • Hash Table",
+    description: {
+      text: "Return length of the longest consecutive sequence of numbers.",
+      notes: [],
+    },
+    examples: [
+      { input: "nums=[100,4,200,1,3,2]", output: "4" },
+      { input: "nums=[0,3,7,2,5,8,4,6,0,1]", output: "9" },
+    ],
+    constraints: ["0 <= nums.length <= 10^5"],
+    starterCode: {
+      javascript: `function longestConsecutive(nums) {
+  // Write your solution here
+}
+
+console.log(longestConsecutive([100,4,200,1,3,2])); // Expected: 4
+console.log(longestConsecutive([0,3,7,2,5,8,4,6,0,1])); // Expected: 9`,
+      python: `def longestConsecutive(nums):
+    # Write your solution here
+    pass
+
+print(longestConsecutive([100,4,200,1,3,2]))  # Expected: 4
+print(longestConsecutive([0,3,7,2,5,8,4,6,0,1]))  # Expected: 9`,
+      java: `class Solution {
+    public static int longestConsecutive(int[] nums) {
+        // Write your solution here
+        return 0;
+    }
+
+    public static void main(String[] args) {
+        System.out.println(longestConsecutive(new int[]{100,4,200,1,3,2})); // Expected: 4
+        System.out.println(longestConsecutive(new int[]{0,3,7,2,5,8,4,6,0,1})); // Expected: 9
+    }
+}`,
+    },
+    expectedOutput: {
+      javascript: "4\n9",
+      python: "4\n9",
+      java: "4\n9",
+    },
+  },
+
+  "find-all-numbers-disappeared-in-an-array": {
+    id: "find-all-numbers-disappeared-in-an-array",
+    title: "Find All Numbers Disappeared in an Array",
+    difficulty: "Easy",
+    category: "Array • In-Place Hashing",
+    description: {
+      text: "Find all numbers in range [1,n] that do not appear in nums.",
+      notes: [],
+    },
+    examples: [
+      { input: "nums=[4,3,2,7,8,2,3,1]", output: "[5,6]" },
+      { input: "nums=[1,1]", output: "[2]" },
+    ],
+    constraints: ["n == nums.length", "1 <= n <= 10^5"],
+    starterCode: {
+      javascript: `function findDisappearedNumbers(nums) {
+  // Write your solution here
+}
+
+console.log(findDisappearedNumbers([4,3,2,7,8,2,3,1])); // Expected: [5,6]
+console.log(findDisappearedNumbers([1,1])); // Expected: [2]`,
+      python: `def findDisappearedNumbers(nums):
+    # Write your solution here
+    pass
+
+print(findDisappearedNumbers([4,3,2,7,8,2,3,1]))  # Expected: [5,6]
+print(findDisappearedNumbers([1,1]))  # Expected: [2]`,
+      java: `import java.util.*;
+
+class Solution {
+    public static List<Integer> findDisappearedNumbers(int[] nums) {
+        // Write your solution here
+        return new ArrayList<>();
+    }
+
+    public static void main(String[] args) {
+        System.out.println(findDisappearedNumbers(new int[]{4,3,2,7,8,2,3,1})); // Expected: [5, 6]
+        System.out.println(findDisappearedNumbers(new int[]{1,1})); // Expected: [2]
+    }
+}`,
+    },
+    expectedOutput: {
+      javascript: "[5,6]\n[2]",
+      python: "[5, 6]\n[2]",
+      java: "[5, 6]\n[2]",
+    },
+  },
+
+  "longest-common-prefix": {
+    id: "longest-common-prefix",
+    title: "Longest Common Prefix",
+    difficulty: "Easy",
+    category: "String • Pattern Matching",
+    description: {
+      text: "Find the longest common prefix among an array of strings.",
+      notes: [],
+    },
+    examples: [
+      { input: 'strs=["flower","flow","flight"]', output: '"fl"' },
+      { input: 'strs=["dog","racecar","car"]', output: '""' },
+    ],
+    constraints: ["1 <= strs.length <= 200"],
+    starterCode: {
+      javascript: `function longestCommonPrefix(strs) {
+  // Write your solution here
+}
+
+console.log(longestCommonPrefix(["flower","flow","flight"])); // Expected: fl
+console.log(longestCommonPrefix(["dog","racecar","car"])); // Expected: ""`,
+      python: `def longestCommonPrefix(strs):
+    # Write your solution here
+    pass
+
+print(longestCommonPrefix(["flower","flow","flight"]))  # Expected: fl
+print(longestCommonPrefix(["dog","racecar","car"]))  # Expected: ""`,
+      java: `class Solution {
+    public static String longestCommonPrefix(String[] strs) {
+        // Write your solution here
+        return "";
+    }
+
+    public static void main(String[] args) {
+        System.out.println(longestCommonPrefix(new String[]{"flower","flow","flight"})); // Expected: fl
+        System.out.println(longestCommonPrefix(new String[]{"dog","racecar","car"})); // Expected: ""
+    }
+}`,
+    },
+    expectedOutput: {
+      javascript: "fl",
+      python: "fl",
+      java: "fl",
+    },
+  },
+
+  "count-and-say": {
+    id: "count-and-say",
+    title: "Count and Say",
+    difficulty: "Medium",
+    category: "String • Pattern Matching",
+    description: {
+      text: "Return the nth term of the count-and-say sequence.",
+      notes: [],
+    },
+    examples: [
+      { input: "n=1", output: '"1"' },
+      { input: "n=4", output: '"1211"' },
+    ],
+    constraints: ["1 <= n <= 30"],
+    starterCode: {
+      javascript: `function countAndSay(n) {
+  // Write your solution here
+}
+
+console.log(countAndSay(1)); // Expected: 1
+console.log(countAndSay(4)); // Expected: 1211`,
+      python: `def countAndSay(n):
+    # Write your solution here
+    pass
+
+print(countAndSay(1))  # Expected: 1
+print(countAndSay(4))  # Expected: 1211`,
+      java: `class Solution {
+    public static String countAndSay(int n) {
+        // Write your solution here
+        return "";
+    }
+
+    public static void main(String[] args) {
+        System.out.println(countAndSay(1)); // Expected: 1
+        System.out.println(countAndSay(4)); // Expected: 1211
+    }
+}`,
+    },
+    expectedOutput: {
+      javascript: "1\n1211",
+      python: "1\n1211",
+      java: "1\n1211",
+    },
+  },
+
+  "zigzag-conversion": {
+    id: "zigzag-conversion",
+    title: "Zigzag Conversion",
+    difficulty: "Medium",
+    category: "String • Pattern Matching",
+    description: {
+      text: "Rearrange string in zigzag with given rows and read line by line.",
+      notes: [],
+    },
+    examples: [
+      { input: 's="PAYPALISHIRING", numRows=3', output: '"PAHNAPLSIIGYIR"' },
+      { input: 's="PAYPALISHIRING", numRows=4', output: '"PINALSIGYAHRPI"' },
+    ],
+    constraints: ["1 <= s.length <= 1000"],
+    starterCode: {
+      javascript: `function convert(s, numRows) {
+  // Write your solution here
+}
+
+console.log(convert("PAYPALISHIRING", 3)); // Expected: PAHNAPLSIIGYIR
+console.log(convert("PAYPALISHIRING", 4)); // Expected: PINALSIGYAHRPI`,
+      python: `def convert(s, numRows):
+    # Write your solution here
+    pass
+
+print(convert("PAYPALISHIRING", 3))  # Expected: PAHNAPLSIIGYIR
+print(convert("PAYPALISHIRING", 4))  # Expected: PINALSIGYAHRPI`,
+      java: `class Solution {
+    public static String convert(String s, int numRows) {
+        // Write your solution here
+        return "";
+    }
+
+    public static void main(String[] args) {
+        System.out.println(convert("PAYPALISHIRING", 3)); // Expected: PAHNAPLSIIGYIR
+        System.out.println(convert("PAYPALISHIRING", 4)); // Expected: PINALSIGYAHRPI
+    }
+}`,
+    },
+    expectedOutput: {
+      javascript: "PAHNAPLSIIGYIR\nPINALSIGYAHRPI",
+      python: "PAHNAPLSIIGYIR\nPINALSIGYAHRPI",
+      java: "PAHNAPLSIIGYIR\nPINALSIGYAHRPI",
+    },
+  },
+
+  "add-strings": {
+    id: "add-strings",
+    title: "Add Strings",
+    difficulty: "Easy",
+    category: "String • Simulation",
+    description: {
+      text: "Add two non-negative integers represented as decimal strings.",
+      notes: ["Do not use built-in big integer conversion."],
+    },
+    examples: [
+      { input: 'num1="11", num2="123"', output: '"134"' },
+      { input: 'num1="456", num2="77"', output: '"533"' },
+    ],
+    constraints: ["1 <= num1.length, num2.length <= 10^4"],
+    starterCode: {
+      javascript: `function addStrings(num1, num2) {
+  // Write your solution here
+}
+
+console.log(addStrings("11", "123")); // Expected: 134
+console.log(addStrings("456", "77")); // Expected: 533`,
+      python: `def addStrings(num1, num2):
+    # Write your solution here
+    pass
+
+print(addStrings("11", "123"))  # Expected: 134
+print(addStrings("456", "77"))  # Expected: 533`,
+      java: `class Solution {
+    public static String addStrings(String num1, String num2) {
+        // Write your solution here
+        return "";
+    }
+
+    public static void main(String[] args) {
+        System.out.println(addStrings("11", "123")); // Expected: 134
+        System.out.println(addStrings("456", "77")); // Expected: 533
+    }
+}`,
+    },
+    expectedOutput: {
+      javascript: "134\n533",
+      python: "134\n533",
+      java: "134\n533",
+    },
+  },
+
+  "multiply-strings": {
+    id: "multiply-strings",
+    title: "Multiply Strings",
+    difficulty: "Medium",
+    category: "String • Math",
+    description: {
+      text: "Multiply two non-negative integer strings and return product as string.",
+      notes: [],
+    },
+    examples: [
+      { input: 'num1="2", num2="3"', output: '"6"' },
+      { input: 'num1="123", num2="456"', output: '"56088"' },
+    ],
+    constraints: ["1 <= num1.length, num2.length <= 200"],
+    starterCode: {
+      javascript: `function multiply(num1, num2) {
+  // Write your solution here
+}
+
+console.log(multiply("2", "3")); // Expected: 6
+console.log(multiply("123", "456")); // Expected: 56088`,
+      python: `def multiply(num1, num2):
+    # Write your solution here
+    pass
+
+print(multiply("2", "3"))  # Expected: 6
+print(multiply("123", "456"))  # Expected: 56088`,
+      java: `class Solution {
+    public static String multiply(String num1, String num2) {
+        // Write your solution here
+        return "";
+    }
+
+    public static void main(String[] args) {
+        System.out.println(multiply("2", "3")); // Expected: 6
+        System.out.println(multiply("123", "456")); // Expected: 56088
+    }
+}`,
+    },
+    expectedOutput: {
+      javascript: "6\n56088",
+      python: "6\n56088",
+      java: "6\n56088",
+    },
+  },
+
+  "search-insert-position": {
+    id: "search-insert-position",
+    title: "Search Insert Position",
+    difficulty: "Easy",
+    category: "Array • Binary Search",
+    description: {
+      text: "Find index of target in sorted array, or insertion index if missing.",
+      notes: [],
+    },
+    examples: [
+      { input: "nums=[1,3,5,6], target=5", output: "2" },
+      { input: "nums=[1,3,5,6], target=2", output: "1" },
+    ],
+    constraints: ["1 <= nums.length <= 10^4"],
+    starterCode: {
+      javascript: `function searchInsert(nums, target) {
+  // Write your solution here
+}
+
+console.log(searchInsert([1,3,5,6], 5)); // Expected: 2
+console.log(searchInsert([1,3,5,6], 2)); // Expected: 1`,
+      python: `def searchInsert(nums, target):
+    # Write your solution here
+    pass
+
+print(searchInsert([1,3,5,6], 5))  # Expected: 2
+print(searchInsert([1,3,5,6], 2))  # Expected: 1`,
+      java: `class Solution {
+    public static int searchInsert(int[] nums, int target) {
+        // Write your solution here
+        return -1;
+    }
+
+    public static void main(String[] args) {
+        System.out.println(searchInsert(new int[]{1,3,5,6}, 5)); // Expected: 2
+        System.out.println(searchInsert(new int[]{1,3,5,6}, 2)); // Expected: 1
+    }
+}`,
+    },
+    expectedOutput: {
+      javascript: "2\n1",
+      python: "2\n1",
+      java: "2\n1",
+    },
+  },
+
+  "find-first-and-last-position-of-element-in-sorted-array": {
+    id: "find-first-and-last-position-of-element-in-sorted-array",
+    title: "Find First and Last Position of Element in Sorted Array",
+    difficulty: "Medium",
+    category: "Array • Binary Search",
+    description: {
+      text: "Find first and last index of target in sorted array.",
+      notes: ["Return [-1,-1] if not found."],
+    },
+    examples: [
+      { input: "nums=[5,7,7,8,8,10], target=8", output: "[3,4]" },
+      { input: "nums=[5,7,7,8,8,10], target=6", output: "[-1,-1]" },
+    ],
+    constraints: ["0 <= nums.length <= 10^5"],
+    starterCode: {
+      javascript: `function searchRange(nums, target) {
+  // Write your solution here
+}
+
+console.log(searchRange([5,7,7,8,8,10], 8)); // Expected: [3,4]
+console.log(searchRange([5,7,7,8,8,10], 6)); // Expected: [-1,-1]`,
+      python: `def searchRange(nums, target):
+    # Write your solution here
+    pass
+
+print(searchRange([5,7,7,8,8,10], 8))  # Expected: [3,4]
+print(searchRange([5,7,7,8,8,10], 6))  # Expected: [-1,-1]`,
+      java: `import java.util.*;
+
+class Solution {
+    public static int[] searchRange(int[] nums, int target) {
+        // Write your solution here
+        return new int[0];
+    }
+
+    public static void main(String[] args) {
+        System.out.println(Arrays.toString(searchRange(new int[]{5,7,7,8,8,10}, 8))); // Expected: [3, 4]
+        System.out.println(Arrays.toString(searchRange(new int[]{5,7,7,8,8,10}, 6))); // Expected: [-1, -1]
+    }
+}`,
+    },
+    expectedOutput: {
+      javascript: "[3,4]\n[-1,-1]",
+      python: "[3, 4]\n[-1, -1]",
+      java: "[3, 4]\n[-1, -1]",
+    },
+  },
+
+  "search-a-2d-matrix": {
+    id: "search-a-2d-matrix",
+    title: "Search a 2D Matrix",
+    difficulty: "Medium",
+    category: "Matrix • Binary Search",
+    description: {
+      text: "Search target in row-wise sorted matrix treated as sorted 1D list.",
+      notes: [],
+    },
+    examples: [
+      {
+        input: "matrix=[[1,3,5,7],[10,11,16,20],[23,30,34,60]], target=3",
+        output: "true",
+      },
+      {
+        input: "matrix=[[1,3,5,7],[10,11,16,20],[23,30,34,60]], target=13",
+        output: "false",
+      },
+    ],
+    constraints: ["m == matrix.length", "n == matrix[i].length"],
+    starterCode: {
+      javascript: `function searchMatrix(matrix, target) {
+  // Write your solution here
+}
+
+console.log(searchMatrix([[1,3,5,7],[10,11,16,20],[23,30,34,60]], 3)); // Expected: true
+console.log(searchMatrix([[1,3,5,7],[10,11,16,20],[23,30,34,60]], 13)); // Expected: false`,
+      python: `def searchMatrix(matrix, target):
+    # Write your solution here
+    pass
+
+print(searchMatrix([[1,3,5,7],[10,11,16,20],[23,30,34,60]], 3))  # Expected: True
+print(searchMatrix([[1,3,5,7],[10,11,16,20],[23,30,34,60]], 13))  # Expected: False`,
+      java: `class Solution {
+    public static boolean searchMatrix(int[][] matrix, int target) {
+        // Write your solution here
+        return false;
+    }
+
+    public static void main(String[] args) {
+        int[][] matrix = {{1,3,5,7},{10,11,16,20},{23,30,34,60}};
+        System.out.println(searchMatrix(matrix, 3)); // Expected: true
+        System.out.println(searchMatrix(matrix, 13)); // Expected: false
+    }
+}`,
+    },
+    expectedOutput: {
+      javascript: "true\nfalse",
+      python: "True\nFalse",
+      java: "true\nfalse",
+    },
+  },
+
+  sqrtx: {
+    id: "sqrtx",
+    title: "Sqrt(x)",
+    difficulty: "Easy",
+    category: "Math • Binary Search",
+    description: {
+      text: "Compute and return the integer square root of x.",
+      notes: ["Result should be truncated to integer part."],
+    },
+    examples: [
+      { input: "x=4", output: "2" },
+      { input: "x=8", output: "2" },
+    ],
+    constraints: ["0 <= x <= 2^31 - 1"],
+    starterCode: {
+      javascript: `function mySqrt(x) {
+  // Write your solution here
+}
+
+console.log(mySqrt(4)); // Expected: 2
+console.log(mySqrt(8)); // Expected: 2`,
+      python: `def mySqrt(x):
+    # Write your solution here
+    pass
+
+print(mySqrt(4))  # Expected: 2
+print(mySqrt(8))  # Expected: 2`,
+      java: `class Solution {
+    public static int mySqrt(int x) {
+        // Write your solution here
+        return 0;
+    }
+
+    public static void main(String[] args) {
+        System.out.println(mySqrt(4)); // Expected: 2
+        System.out.println(mySqrt(8)); // Expected: 2
+    }
+}`,
+    },
+    expectedOutput: {
+      javascript: "2\n2",
+      python: "2\n2",
+      java: "2\n2",
+    },
+  },
+
+  "koko-eating-bananas": {
+    id: "koko-eating-bananas",
+    title: "Koko Eating Bananas",
+    difficulty: "Medium",
+    category: "Array • Binary Search",
+    description: {
+      text: "Find minimum integer eating speed so all bananas are eaten within h hours.",
+      notes: [],
+    },
+    examples: [
+      { input: "piles=[3,6,7,11], h=8", output: "4" },
+      { input: "piles=[30,11,23,4,20], h=5", output: "30" },
+    ],
+    constraints: ["1 <= piles.length <= 10^4"],
+    starterCode: {
+      javascript: `function minEatingSpeed(piles, h) {
+  // Write your solution here
+}
+
+console.log(minEatingSpeed([3,6,7,11], 8)); // Expected: 4
+console.log(minEatingSpeed([30,11,23,4,20], 5)); // Expected: 30`,
+      python: `def minEatingSpeed(piles, h):
+    # Write your solution here
+    pass
+
+print(minEatingSpeed([3,6,7,11], 8))  # Expected: 4
+print(minEatingSpeed([30,11,23,4,20], 5))  # Expected: 30`,
+      java: `class Solution {
+    public static int minEatingSpeed(int[] piles, int h) {
+        // Write your solution here
+        return 0;
+    }
+
+    public static void main(String[] args) {
+        System.out.println(minEatingSpeed(new int[]{3,6,7,11}, 8)); // Expected: 4
+        System.out.println(minEatingSpeed(new int[]{30,11,23,4,20}, 5)); // Expected: 30
+    }
+}`,
+    },
+    expectedOutput: {
+      javascript: "4\n30",
+      python: "4\n30",
+      java: "4\n30",
+    },
+  },
 };
