@@ -312,8 +312,8 @@ function SessionPage() {
                 <div className="h-full overflow-y-auto bg-base-200">
                   {/* HEADER SECTION */}
                   <div className="p-6 bg-base-100 border-b border-base-300">
-                    <div className="flex items-start justify-between mb-3">
-                      <div>
+                    <div className="space-y-4">
+                      <div className="min-w-0">
                         <h1 className="text-3xl font-bold text-base-content">
                           {session?.problem || "Loading..."}
                         </h1>
@@ -328,9 +328,9 @@ function SessionPage() {
                         </p>
                       </div>
 
-                      <div className="flex items-center gap-3">
+                      <div className="flex flex-wrap items-center gap-2">
                         {isHost && hostSessionPassword && (
-                          <div className="flex items-center gap-2 bg-base-200 border border-base-300 rounded-lg px-2.5 py-1.5">
+                          <div className="flex items-center gap-2 bg-base-200 border border-base-300 rounded-lg px-2.5 py-1.5 shrink-0">
                             <span className="text-xs font-medium text-base-content/70">
                               Session Password:
                             </span>
