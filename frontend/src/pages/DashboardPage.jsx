@@ -20,7 +20,11 @@ function DashboardPage() {
   const { user } = useUser();
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [createdSessionData, setCreatedSessionData] = useState(null);
-  const [roomConfig, setRoomConfig] = useState({ problem: "", difficulty: "" });
+  const [roomConfig, setRoomConfig] = useState({
+    problemId: "",
+    problem: "",
+    difficulty: "",
+  });
 
   const createSessionMutation = useCreateSession();
 
@@ -50,12 +54,11 @@ function DashboardPage() {
   }, [refetchActiveSessions, refetchRecentSessions]);
 
   const handleCreateRoom = () => {
-    if (!roomConfig.problem || !roomConfig.difficulty) return;
+    if (!roomConfig.problemId) return;
 
     createSessionMutation.mutate(
       {
-        problem: roomConfig.problem,
-        difficulty: roomConfig.difficulty.toLowerCase(),
+        problemId: roomConfig.problemId,
       },
       {
         onSuccess: (data) => {
@@ -178,8 +181,11 @@ function DashboardPage() {
       />
 
       {createdSessionData && (
-        <div className="modal modal-open">
-          <div className="modal-box max-w-lg">
+        <div className="modal modal-open" onClick={(e) => e.stopPropagation()}>
+          <div
+            className="modal-box max-w-lg"
+            onClick={(e) => e.stopPropagation()}
+          >
             <h3 className="font-bold text-2xl mb-3">Session Password</h3>
             <p className="text-base-content/70 mb-5">
               Share this password with the participant. They must enter this to
@@ -205,10 +211,7 @@ function DashboardPage() {
               </button>
             </div>
           </div>
-          <div
-            className="modal-backdrop"
-            onClick={handleContinueToSession}
-          ></div>
+          <div className="modal-backdrop"></div>
         </div>
       )}
     </>

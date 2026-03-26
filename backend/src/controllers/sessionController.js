@@ -3,6 +3,7 @@ import { StreamChat } from "stream-chat";
 import { chatClient, streamClient } from "../lib/stream.js";
 import crypto from "crypto";
 import { ENV } from "../lib/env.js";
+import { PROBLEMS } from "../data/problems.js";
 
 const PASSWORD_LENGTH = 8;
 const ALLOWED_DIFFICULTIES = new Set(["easy", "medium", "hard", "open"]);
@@ -32,18 +33,29 @@ export async function createSession(req, res) {
       });
     }
 
-    const { problem, difficulty } = req.body;
+    const { problemId, problem, difficulty } = req.body;
     const userId = req.user._id;
     const clerkId = req.user.clerkId;
-    const normalizedDifficulty = String(difficulty || "").toLowerCase();
+    const selectedProblem = problemId ? PROBLEMS[problemId] : null;
 
-    if (!problem || !normalizedDifficulty) {
-      return res
-        .status(400)
-        .json({ message: "Problem and difficulty are required" });
+    if (problemId && !selectedProblem) {
+      return res.status(400).json({ message: "Invalid problem id" });
     }
 
-    if (!ALLOWED_DIFFICULTIES.has(normalizedDifficulty)) {
+    const resolvedProblem = selectedProblem?.title || problem;
+    const resolvedDifficulty = selectedProblem
+      ? selectedProblem.mode === "freestyle"
+        ? "open"
+        : String(selectedProblem.difficulty || "").toLowerCase()
+      : String(difficulty || "").toLowerCase();
+
+    if (!resolvedProblem || !resolvedDifficulty) {
+      return res
+        .status(400)
+        .json({ message: "problemId or problem+difficulty are required" });
+    }
+
+    if (!ALLOWED_DIFFICULTIES.has(resolvedDifficulty)) {
       return res.status(400).json({
         message: "Invalid difficulty. Allowed values: easy, medium, hard, open",
       });
@@ -56,8 +68,9 @@ export async function createSession(req, res) {
 
     //This creates session in DB
     const session = await Session.create({
-      problem,
-      difficulty: normalizedDifficulty,
+      problemId: selectedProblem?.id || "",
+      problem: resolvedProblem,
+      difficulty: resolvedDifficulty,
       host: userId,
       callId,
       joinPasswordHash,
@@ -68,8 +81,9 @@ export async function createSession(req, res) {
       data: {
         created_by_id: clerkId,
         custom: {
-          problem,
-          difficulty: normalizedDifficulty,
+          problemId: selectedProblem?.id || "",
+          problem: resolvedProblem,
+          difficulty: resolvedDifficulty,
           sessionId: session._id.toString(),
         },
       },
@@ -78,7 +92,7 @@ export async function createSession(req, res) {
     //This creates chat messaging
 
     const channel = chatClient.channel("messaging", callId, {
-      name: `${problem} Session`,
+      name: `${resolvedProblem} Session`,
       created_by_id: clerkId,
       members: [clerkId],
     });

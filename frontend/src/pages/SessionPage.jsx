@@ -50,7 +50,6 @@ function SessionPage() {
 
   const session = sessionData?.session;
   const isHost = session?.host?.clerkId === user?.id;
-  const isParticipant = session?.participant?.clerkId === user?.id;
   const needsToJoin = !!session && !!user && !loadingSession && !isHost;
   const canEnterSession = isHost || hasVerifiedAccess;
   const rawHostName = session?.host?.name?.trim();
@@ -71,10 +70,12 @@ function SessionPage() {
   const { call, channel, chatClient, isInitializingCall, streamClient } =
     useStreamClient(session, loadingSession, isHost, canEnterSession);
 
-  // find the problem data based on session problem title
-  const problemData = session?.problem
-    ? Object.values(problemsMap).find((p) => p.title === session.problem)
-    : null;
+  // Resolve by canonical id first, then fallback to title for older sessions.
+  const problemData = session?.problemId
+    ? problemsMap[session.problemId]
+    : session?.problem
+      ? Object.values(problemsMap).find((p) => p.title === session.problem)
+      : null;
 
   const [selectedLanguage, setSelectedLanguage] = useState("javascript");
   const [code, setCode] = useState(
@@ -175,8 +176,14 @@ function SessionPage() {
       <Navbar />
 
       {needsToJoin && session?.status === "active" && !canEnterSession && (
-        <div className="fixed inset-0 z-50 bg-black/50 flex items-center justify-center p-4">
-          <div className="w-full max-w-md card bg-base-100 shadow-2xl">
+        <div
+          className="fixed inset-0 z-50 bg-black/50 flex items-center justify-center p-4"
+          onClick={(e) => e.stopPropagation()}
+        >
+          <div
+            className="w-full max-w-md card bg-base-100 shadow-2xl"
+            onClick={(e) => e.stopPropagation()}
+          >
             <div className="card-body">
               <h2 className="card-title text-2xl">Join Protected Session</h2>
               <p className="text-base-content/70">
@@ -190,7 +197,7 @@ function SessionPage() {
                 </span>
                 <input
                   type="text"
-                  className="input input-bordered w-full py-3"
+                  className="input input-bordered w-full py-3 transition-all focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 focus:shadow-sm"
                   value={joinPassword}
                   maxLength={8}
                   onChange={(e) => setJoinPassword(e.target.value)}
@@ -226,8 +233,14 @@ function SessionPage() {
       )}
 
       {showEndSessionDialog && (
-        <div className="fixed inset-0 z-50 bg-black/50 flex items-center justify-center p-4">
-          <div className="w-full max-w-md card bg-base-100 shadow-2xl">
+        <div
+          className="fixed inset-0 z-50 bg-black/50 flex items-center justify-center p-4"
+          onClick={(e) => e.stopPropagation()}
+        >
+          <div
+            className="w-full max-w-md card bg-base-100 shadow-2xl"
+            onClick={(e) => e.stopPropagation()}
+          >
             <div className="card-body">
               <h2 className="card-title text-2xl">End Session?</h2>
               <p className="text-base-content/70">

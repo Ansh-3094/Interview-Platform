@@ -3,101 +3,12 @@ import Navbar from "../components/Navbar.jsx";
 import { ArrowLeftIcon, ChevronRightIcon, Code2Icon } from "lucide-react";
 import { getDifficultyBadgeClass } from "../lib/utils.js";
 import { useProblems } from "../hooks/useProblems.js";
-
-const TRACKS = [
-  {
-    id: "stack",
-    title: "Stack Challenges",
-    matcher: (problem) => problem.category.toLowerCase().includes("stack"),
-  },
-  {
-    id: "queue",
-    title: "Queue Challenges",
-    matcher: (problem) => problem.category.toLowerCase().includes("queue"),
-  },
-  {
-    id: "linked-list",
-    title: "Linked List Challenges",
-    matcher: (problem) =>
-      problem.category.toLowerCase().includes("linked list"),
-  },
-  {
-    id: "tree-graph",
-    title: "Tree and Graph Challenges",
-    matcher: (problem) => {
-      const category = problem.category.toLowerCase();
-      return category.includes("tree") || category.includes("graph");
-    },
-  },
-  {
-    id: "dynamic-programming",
-    title: "Dynamic Programming Challenges",
-    matcher: (problem) =>
-      problem.category.toLowerCase().includes("dynamic programming"),
-  },
-  {
-    id: "sliding-window-two-pointers",
-    title: "Sliding Window and Two Pointers",
-    matcher: (problem) => {
-      const category = problem.category.toLowerCase();
-      return (
-        category.includes("sliding window") || category.includes("two pointers")
-      );
-    },
-  },
-  {
-    id: "array-hashing",
-    title: "Array and Hashing",
-    matcher: (problem) => {
-      const category = problem.category.toLowerCase();
-      return (
-        category.includes("array") ||
-        category.includes("hash table") ||
-        category.includes("prefix/suffix") ||
-        category.includes("in-place hashing")
-      );
-    },
-  },
-  {
-    id: "string-patterns",
-    title: "String Patterns",
-    matcher: (problem) => problem.category.toLowerCase().includes("string"),
-  },
-  {
-    id: "binary-search",
-    title: "Binary Search",
-    matcher: (problem) =>
-      problem.category.toLowerCase().includes("binary search"),
-  },
-  {
-    id: "random",
-    title: "Random Mix Practice",
-    matcher: (problem) => problem.id !== "practice-freely",
-  },
-];
-
-const ORDERED_TRACKS = [
-  ...TRACKS.filter((track) => track.id !== "random"),
-  TRACKS.find((track) => track.id === "random"),
-].filter(Boolean);
-
-const DIFFICULTY_ORDER = {
-  Easy: 1,
-  Medium: 2,
-  Hard: 3,
-};
-
-const sortProblemsByDifficulty = (problems) =>
-  [...problems].sort((a, b) => {
-    const aOrder = DIFFICULTY_ORDER[a.difficulty] ?? 99;
-    const bOrder = DIFFICULTY_ORDER[b.difficulty] ?? 99;
-
-    if (aOrder !== bOrder) {
-      return aOrder - bOrder;
-    }
-
-    return a.title.localeCompare(b.title);
-  });
+import {
+  ORDERED_TRACKS,
+  getAllProblems,
+  getProblemsForTrack,
+  getTrackProblems,
+} from "../lib/problemTracks.js";
 
 function ProblemsPage() {
   const { data: problemsData, isLoading, isError } = useProblems();
@@ -108,37 +19,10 @@ function ProblemsPage() {
   );
 
   const problemsMap = problemsData?.problems || {};
-  const allProblems = Object.values(problemsMap);
-  const practiceFreely = problemsMap["practice-freely"];
-
-  const getTrackProblems = (track) => {
-    if (!track) return [];
-
-    const nonFreestyleProblems = allProblems.filter(
-      (problem) => problem.id !== "practice-freely",
-    );
-
-    if (track.id === "random") {
-      return sortProblemsByDifficulty(nonFreestyleProblems);
-    }
-
-    const matchedProblems = sortProblemsByDifficulty(
-      nonFreestyleProblems.filter((problem) => track.matcher(problem)),
-    );
-    return matchedProblems;
-  };
-
-  const sortedTrackProblems = selectedTrack
-    ? getTrackProblems(selectedTrack)
-    : [];
+  const allProblems = getAllProblems(problemsMap);
 
   const problems = selectedTrack
-    ? [
-        practiceFreely,
-        ...sortedTrackProblems.filter(
-          (problem) => problem.id !== "practice-freely",
-        ),
-      ]
+    ? getProblemsForTrack(selectedTrack, problemsMap)
     : [];
 
   const safeProblems = problems.filter(Boolean);
@@ -168,7 +52,8 @@ function ProblemsPage() {
         {!selectedTrack && (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {ORDERED_TRACKS.map((track) => {
-              const trackCount = getTrackProblems(track).length + 1;
+              const trackCount =
+                getTrackProblems(track, allProblems).length + 1;
 
               return (
                 <button
