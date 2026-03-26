@@ -129,7 +129,3 @@ npm run preview
 - If frontend cannot reach backend, verify API base URL and CORS settings.
 - If realtime/video fails, verify Stream keys/secrets in both backend and frontend env files.
 - If code execution fails, verify Piston endpoint/settings in backend/frontend integration files.
-
-## License
-
-Add your preferred license here.
