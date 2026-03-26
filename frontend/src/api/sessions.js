@@ -67,6 +67,14 @@ export const sessionApi = {
     );
     return response.data;
   },
+  updateSessionProblem: async ({ id, problemId, token }) => {
+    const response = await axiosInstance.patch(
+      `/sessions/${id}/problem`,
+      { problemId },
+      withAuthHeaders(token),
+    );
+    return response.data;
+  },
   getStreamToken: async ({ token } = {}) => {
     const response = await axiosInstance.get(
       `/chat/token`,

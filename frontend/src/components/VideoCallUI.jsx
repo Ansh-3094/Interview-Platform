@@ -19,7 +19,7 @@ import {
 import "@stream-io/video-react-sdk/dist/css/styles.css";
 import "stream-chat-react/dist/css/v2/index.css";
 
-function VideoCallUI({ chatClient, channel }) {
+function VideoCallUI({ chatClient, channel, isHost, onHostEndCall }) {
   const navigate = useNavigate();
   const { useCallCallingState, useParticipantCount } = useCallStateHooks();
   const callingState = useCallCallingState();
@@ -48,6 +48,15 @@ function VideoCallUI({ chatClient, channel }) {
     if (!isChatOpen) {
       setUnreadCount(0);
     }
+  };
+
+  const handleLeave = () => {
+    if (isHost) {
+      onHostEndCall?.();
+      return;
+    }
+
+    navigate("/dashboard");
   };
 
   if (callingState === CallingState.JOINING) {
@@ -95,7 +104,7 @@ function VideoCallUI({ chatClient, channel }) {
         </div>
 
         <div className="bg-base-100 p-3 rounded-lg shadow flex justify-center">
-          <CallControls onLeave={() => navigate("/dashboard")} />
+          <CallControls onLeave={handleLeave} />
         </div>
       </div>
 

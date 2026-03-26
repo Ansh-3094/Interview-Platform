@@ -282,3 +282,65 @@ export async function endSession(req, res) {
     });
   }
 }
+
+export async function updateSessionProblem(req, res) {
+  try {
+    const { id } = req.params;
+    const { problemId } = req.body;
+    const userId = req.user._id;
+
+    // Validate session exists
+    const session = await Session.findById(id)
+      .populate("host", "name email profileImage clerkId")
+      .populate("participant", "name email profileImage clerkId");
+
+    if (!session) {
+      return res.status(404).json({ message: "Session not found" });
+    }
+
+    // Validate only host can change problem
+    if (session.host._id.toString() !== userId.toString()) {
+      return res
+        .status(403)
+        .json({ message: "Only host can change the problem" });
+    }
+
+    // Validate session is still active
+    if (session.status !== "active") {
+      return res
+        .status(400)
+        .json({ message: "Cannot change problem in a completed session" });
+    }
+
+    // Validate problemId exists in PROBLEMS
+    if (!problemId || !PROBLEMS[problemId]) {
+      return res.status(400).json({ message: "Invalid problem id" });
+    }
+
+    const newProblem = PROBLEMS[problemId];
+    const newDifficulty =
+      newProblem.mode === "freestyle"
+        ? "open"
+        : String(newProblem.difficulty || "").toLowerCase();
+
+    if (!newDifficulty || !ALLOWED_DIFFICULTIES.has(newDifficulty)) {
+      return res.status(400).json({ message: "Invalid problem difficulty" });
+    }
+
+    // Update session with new problem
+    session.problemId = newProblem.id;
+    session.problem = newProblem.title;
+    session.difficulty = newDifficulty;
+    await session.save();
+
+    res.status(200).json({
+      session,
+      message: "Problem changed successfully",
+    });
+  } catch (error) {
+    console.log("Error in updateSessionProblem controller", error.message);
+    res.status(500).json({
+      message: "Internal Server Error",
+    });
+  }
+}

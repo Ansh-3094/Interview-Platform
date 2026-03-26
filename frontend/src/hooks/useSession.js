@@ -97,3 +97,18 @@ export const useEndSession = () => {
   });
   return result;
 };
+
+export const useUpdateSessionProblem = () => {
+  const { getToken } = useAuth();
+
+  const result = useMutation({
+    mutationFn: async ({ id, problemId }) => {
+      const token = await getToken();
+      return sessionApi.updateSessionProblem({ id, problemId, token });
+    },
+    onSuccess: () => toast.success("Problem changed successfully"),
+    onError: (error) =>
+      toast.error(error.response?.data?.message || "Failed to change problem"),
+  });
+  return result;
+};

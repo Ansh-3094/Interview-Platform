@@ -9,6 +9,7 @@ import {
 import { useProblems } from "../hooks/useProblems.js";
 import { executeCode } from "../lib/piston.js";
 import Navbar from "../components/Navbar.jsx";
+import ChangeSessionProblemModal from "../components/ChangeSessionProblemModal.jsx";
 import { Panel, PanelGroup, PanelResizeHandle } from "react-resizable-panels";
 import { getDifficultyBadgeClass } from "../lib/utils.js";
 import {
@@ -17,6 +18,7 @@ import {
   Loader2Icon,
   LogOutIcon,
   PhoneOffIcon,
+  EditIcon,
 } from "lucide-react";
 import CodeEditorPanel from "../components/CodeEditorPanel.jsx";
 import OutputPanel from "../components/OutputPanel.jsx";
@@ -36,6 +38,7 @@ function SessionPage() {
   const [showHostPassword, setShowHostPassword] = useState(false);
   const [hasVerifiedAccess, setHasVerifiedAccess] = useState(false);
   const [showEndSessionDialog, setShowEndSessionDialog] = useState(false);
+  const [showChangeProblemModal, setShowChangeProblemModal] = useState(false);
 
   const {
     data: sessionData,
@@ -128,6 +131,26 @@ function SessionPage() {
   const handleCancelEndSession = () => {
     if (endSessionMutation.isPending) return;
     setShowEndSessionDialog(false);
+  };
+
+  const handleProblemChanged = async (newProblem) => {
+    // Clear output panel on problem change
+    setOutput(null);
+
+    // Send Stream Chat message to notify participant
+    if (channel) {
+      try {
+        await channel.sendMessage({
+          text: `Problem changed to: ${newProblem.title}`,
+          type: "notification",
+        });
+      } catch (error) {
+        console.error("Error sending notification message:", error);
+      }
+    }
+
+    // Refetch session to ensure UI is in sync
+    refetch();
   };
 
   const handleJoinSession = () => {
@@ -231,6 +254,13 @@ function SessionPage() {
           </div>
         </div>
       )}
+
+      <ChangeSessionProblemModal
+        isOpen={showChangeProblemModal}
+        onClose={() => setShowChangeProblemModal(false)}
+        sessionId={id}
+        onProblemChanged={handleProblemChanged}
+      />
 
       {showEndSessionDialog && (
         <div
@@ -337,6 +367,16 @@ function SessionPage() {
                         >
                           {difficultyLabel}
                         </span>
+                        {isHost && session?.status === "active" && (
+                          <button
+                            onClick={() => setShowChangeProblemModal(true)}
+                            disabled={endSessionMutation.isPending}
+                            className="btn btn-primary btn-sm gap-2"
+                          >
+                            <EditIcon className="w-4 h-4" />
+                            Change Problem
+                          </button>
+                        )}
                         {isHost && session?.status === "active" && (
                           <button
                             onClick={handleEndSession}
@@ -505,7 +545,12 @@ function SessionPage() {
                 <div className="h-full">
                   <StreamVideo client={streamClient}>
                     <StreamCall call={call}>
-                      <VideoCallUI chatClient={chatClient} channel={channel} />
+                      <VideoCallUI
+                        chatClient={chatClient}
+                        channel={channel}
+                        isHost={isHost}
+                        onHostEndCall={handleEndSession}
+                      />
                     </StreamCall>
                   </StreamVideo>
                 </div>
