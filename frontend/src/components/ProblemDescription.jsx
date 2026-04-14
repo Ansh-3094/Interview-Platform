@@ -29,7 +29,7 @@ function ProblemDescription({
         {/* Problem selector */}
         <div className="mt-4">
           <select
-            className="select select-sm w-full"
+            className="select select-sm w-full cursor-pointer transition-all border-base-300 focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 focus:shadow-sm"
             value={currentProblemId}
             onChange={(e) => onProblemChange(e.target.value)}
           >

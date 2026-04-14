@@ -20,7 +20,7 @@ function CodeEditorPanel({
             className="size-6"
           />
           <select
-            className="select select-sm"
+            className="select select-sm w-full cursor-pointer transition-all border-base-300 focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 focus:shadow-sm"
             value={selectedLanguage}
             onChange={onLanguageChange}
           >

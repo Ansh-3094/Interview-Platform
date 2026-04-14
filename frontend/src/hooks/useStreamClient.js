@@ -37,18 +37,41 @@ function useStreamClient(session, loadingSession, isHost, isParticipant) {
     return "";
   }, [user]);
 
+  const sessionCallId = session?.callId;
+  const sessionStatus = session?.status;
+  const canJoinCall =
+    Boolean(sessionCallId) &&
+    sessionStatus !== "completed" &&
+    (isHost || isParticipant);
+
+  const setActiveCallSession = (callId) => {
+    if (callId) {
+      window.sessionStorage.setItem("active-video-call-session-id", callId);
+    } else {
+      window.sessionStorage.removeItem("active-video-call-session-id");
+    }
+
+    window.dispatchEvent(new Event("live-session-lock-change"));
+  };
+
   useEffect(() => {
+    let isCancelled = false;
     let videoCall = null;
     let chatClientInstance = null;
 
     const initCall = async () => {
-      if (!session?.callId) return;
-      if (!isHost && !isParticipant) return;
-      if (session.status === "completed") return;
+      if (!canJoinCall) {
+        setIsInitializingCall(false);
+        return;
+      }
+
+      setIsInitializingCall(true);
 
       try {
         const { token, userId, userName, userImage } =
           await sessionApi.getStreamToken();
+
+        if (isCancelled) return;
 
         const finalUserName =
           clerkDisplayName || userName?.trim() || userId || "User";
@@ -63,55 +86,107 @@ function useStreamClient(session, loadingSession, isHost, isParticipant) {
           token,
         );
 
+        if (isCancelled) return;
         setStreamClient(client);
 
-        videoCall = client.call("default", session.callId);
+        videoCall = client.call("default", sessionCallId);
         await videoCall.join({ create: true });
+
+        setActiveCallSession(sessionCallId);
+
+        if (isCancelled) {
+          try {
+            await videoCall.leave();
+          } catch {
+            // Ignore cleanup errors during interrupted init.
+          }
+          return;
+        }
         setCall(videoCall);
 
         const apiKey = import.meta.env.VITE_STREAM_API_KEY;
         chatClientInstance = StreamChat.getInstance(apiKey);
 
-        await chatClientInstance.connectUser(
-          {
-            id: userId,
-            name: finalUserName,
-            image: finalUserImage,
-          },
-          token,
-        );
+        if (chatClientInstance.userID !== userId) {
+          if (chatClientInstance.userID) {
+            await chatClientInstance.disconnectUser();
+          }
+
+          await chatClientInstance.connectUser(
+            {
+              id: userId,
+              name: finalUserName,
+              image: finalUserImage,
+            },
+            token,
+          );
+        }
+
+        if (isCancelled) return;
         setChatClient(chatClientInstance);
 
         const chatChannel = chatClientInstance.channel(
           "messaging",
-          session.callId,
+          sessionCallId,
         );
         await chatChannel.watch();
+
+        if (isCancelled) return;
         setChannel(chatChannel);
       } catch (error) {
-        toast.error("Failed to join video call");
+        if (!isCancelled) {
+          toast.error("Failed to join video call");
+        }
         console.error("Error init call", error);
       } finally {
-        setIsInitializingCall(false);
+        if (!isCancelled) {
+          setIsInitializingCall(false);
+        }
       }
     };
 
-    if (session && !loadingSession) initCall();
+    if (!loadingSession) initCall();
 
     // cleanup - performance reasons
     return () => {
+      isCancelled = true;
       // iife
       (async () => {
         try {
-          if (videoCall) await videoCall.leave();
-          if (chatClientInstance) await chatClientInstance.disconnectUser();
+          if (videoCall) {
+            try {
+              await videoCall.leave();
+            } catch (error) {
+              const message = String(error?.message || "");
+              if (!message.includes("already been left")) {
+                console.error("Cleanup leave error:", error);
+              }
+            }
+          }
+
+          if (chatClientInstance?.userID) {
+            await chatClientInstance.disconnectUser();
+          }
+
           await disconnectStreamClient();
+          setActiveCallSession(null);
+
+          setCall(null);
+          setChannel(null);
+          setChatClient(null);
+          setStreamClient(null);
         } catch (error) {
           console.error("Cleanup error:", error);
         }
       })();
     };
-  }, [session, loadingSession, isHost, isParticipant, clerkDisplayName, user]);
+  }, [
+    canJoinCall,
+    clerkDisplayName,
+    loadingSession,
+    sessionCallId,
+    user?.imageUrl,
+  ]);
 
   return {
     streamClient,

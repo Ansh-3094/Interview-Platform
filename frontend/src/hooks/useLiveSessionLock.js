@@ -1,29 +1,30 @@
-import { useMemo } from "react";
-import { useUser } from "@clerk/clerk-react";
-import { useActiveSessions } from "./useSession.js";
+import { useEffect, useState } from "react";
 
 function useLiveSessionLock() {
-  const { isLoaded, isSignedIn, user } = useUser();
-  const { data, isLoading } = useActiveSessions();
+  const [liveSessionId, setLiveSessionId] = useState(() =>
+    window.sessionStorage.getItem("active-video-call-session-id"),
+  );
 
-  const liveSession = useMemo(() => {
-    if (!isSignedIn || !user?.id) return null;
+  useEffect(() => {
+    const syncLock = () => {
+      setLiveSessionId(
+        window.sessionStorage.getItem("active-video-call-session-id"),
+      );
+    };
 
-    const sessions = data?.sessions || [];
-    return (
-      sessions.find(
-        (session) =>
-          session.status === "active" &&
-          (session.host?.clerkId === user.id ||
-            session.participant?.clerkId === user.id),
-      ) || null
-    );
-  }, [data, isSignedIn, user?.id]);
+    window.addEventListener("storage", syncLock);
+    window.addEventListener("live-session-lock-change", syncLock);
+
+    return () => {
+      window.removeEventListener("storage", syncLock);
+      window.removeEventListener("live-session-lock-change", syncLock);
+    };
+  }, []);
 
   return {
-    isCheckingLiveSession: isSignedIn && (!isLoaded || isLoading),
-    isInLiveSession: Boolean(liveSession),
-    liveSessionId: liveSession?._id || liveSession?.id || null,
+    isCheckingLiveSession: false,
+    isInLiveSession: Boolean(liveSessionId),
+    liveSessionId,
   };
 }
 
