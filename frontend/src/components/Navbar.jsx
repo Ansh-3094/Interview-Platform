@@ -1,9 +1,11 @@
 import { Link, useLocation } from "react-router";
 import { BookOpenIcon, LayoutDashboardIcon, SparklesIcon } from "lucide-react";
 import { UserButton } from "@clerk/clerk-react";
+import useLiveSessionLock from "../hooks/useLiveSessionLock.js";
 
 function Navbar() {
   const location = useLocation();
+  const { isInLiveSession } = useLiveSessionLock();
 
   const isProblemsRoute =
     location.pathname === "/problems" ||
@@ -36,9 +38,10 @@ function Navbar() {
 
         <div className="flex items-center gap-1">
           {/* PROBLEMS PAGE LINK */}
-          <Link
-            to={"/problems"}
-            className={`px-4 py-2.5 rounded-lg transition-all duration-200 
+          {!isInLiveSession && (
+            <Link
+              to={"/problems"}
+              className={`px-4 py-2.5 rounded-lg transition-all duration-200 
               ${
                 isProblemsRoute
                   ? "bg-primary text-primary-content"
@@ -46,12 +49,13 @@ function Navbar() {
               }
               
               `}
-          >
-            <div className="flex items-center gap-x-2.5">
-              <BookOpenIcon className="size-4" />
-              <span className="font-medium hidden sm:inline">Problems</span>
-            </div>
-          </Link>
+            >
+              <div className="flex items-center gap-x-2.5">
+                <BookOpenIcon className="size-4" />
+                <span className="font-medium hidden sm:inline">Problems</span>
+              </div>
+            </Link>
+          )}
 
           {/* DASHBOARD PAGE LINK */}
           <Link

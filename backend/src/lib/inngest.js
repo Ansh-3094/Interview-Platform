@@ -5,29 +5,81 @@ import { deleteStreamUser, upsertStreamUser } from "./stream.js";
 
 export const inngest = new Inngest({ id: "interview-platform" });
 
+function pickPrimaryEmail(clerkUserData) {
+  const emailList = clerkUserData?.email_addresses || [];
+  const primaryId = clerkUserData?.primary_email_address_id;
+
+  if (primaryId) {
+    const primary = emailList.find((entry) => entry?.id === primaryId);
+    const primaryEmail = primary?.email_address;
+    if (primaryEmail) return primaryEmail;
+  }
+
+  return emailList[0]?.email_address || "";
+}
+
+function pickDisplayName(clerkUserData) {
+  const firstName = clerkUserData?.first_name || "";
+  const lastName = clerkUserData?.last_name || "";
+  const fullName = [firstName, lastName].filter(Boolean).join(" ").trim();
+
+  return (
+    fullName ||
+    clerkUserData?.username ||
+    pickPrimaryEmail(clerkUserData).split("@")[0] ||
+    "User"
+  );
+}
+
+async function syncUserRecord(clerkUserData) {
+  const clerkId = clerkUserData?.id;
+  const email = pickPrimaryEmail(clerkUserData);
+  const name = pickDisplayName(clerkUserData);
+  const profileImage = clerkUserData?.image_url || "";
+
+  const user = await User.findOneAndUpdate(
+    { clerkId },
+    {
+      $set: {
+        email,
+        name,
+        profileImage,
+      },
+    },
+    {
+      new: true,
+      upsert: true,
+      setDefaultsOnInsert: true,
+    },
+  );
+
+  await upsertStreamUser({
+    id: clerkId.toString(),
+    name,
+    image: profileImage,
+  });
+
+  return user;
+}
+
 const syncUser = inngest.createFunction(
   { id: "sync-user" },
   { event: "clerk.user.created" },
   async ({ event }) => {
     await connectDB();
 
-    const { id, email_addresses, first_name, last_name, image_url } =
-      event.data;
+    const user = await syncUserRecord(event.data);
+    return { user };
+  },
+);
 
-    const newUser = {
-      clerkId: id,
-      email: email_addresses[0]?.email_address,
-      name: `${first_name || ""} ${last_name || ""}`,
-      profileImage: image_url,
-    };
+const syncUpdatedUser = inngest.createFunction(
+  { id: "sync-updated-user" },
+  { event: "clerk.user.updated" },
+  async ({ event }) => {
+    await connectDB();
 
-    const user = await User.create(newUser);
-
-    await upsertStreamUser({
-      id: newUser.clerkId.toString(),
-      name: newUser.name,
-      image: newUser.profileImage,
-    });
+    const user = await syncUserRecord(event.data);
     return { user };
   },
 );
@@ -45,4 +97,4 @@ const deleteuserFromDB = inngest.createFunction(
   },
 );
 
-export const functions = [syncUser, deleteuserFromDB];
+export const functions = [syncUser, syncUpdatedUser, deleteuserFromDB];

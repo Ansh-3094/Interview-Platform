@@ -19,6 +19,7 @@ function ActiveSessions({
   isError = false,
   onRetry,
   isUserInSession,
+  currentUser,
 }) {
   const [statusFilter, setStatusFilter] = useState("all");
 
@@ -39,6 +40,33 @@ function ActiveSessions({
 
     return sessions;
   }, [sessions, statusFilter]);
+
+  const getSessionHostDisplayName = (session) => {
+    const rawHostName = session.host?.name?.trim() || "";
+    const hostEmailPrefix = session.host?.email?.split("@")[0]?.trim() || "";
+    const currentUserName =
+      currentUser?.fullName?.trim() ||
+      [currentUser?.firstName, currentUser?.lastName]
+        .filter(Boolean)
+        .join(" ")
+        .trim() ||
+      currentUser?.username?.trim() ||
+      "";
+
+    if (session.host?.clerkId === currentUser?.id && currentUserName) {
+      return currentUserName;
+    }
+
+    if (rawHostName && !rawHostName.startsWith("user_")) {
+      return rawHostName;
+    }
+
+    if (hostEmailPrefix && !hostEmailPrefix.startsWith("user_")) {
+      return hostEmailPrefix;
+    }
+
+    return "Host";
+  };
 
   return (
     <div className="lg:col-span-2 card bg-base-100 border-2 border-primary/20 hover:border-primary/30 h-full">
@@ -127,7 +155,7 @@ function ActiveSessions({
                         <div className="flex items-center gap-1.5">
                           <CrownIcon className="size-4" />
                           <span className="font-medium">
-                            {session.host?.name}
+                            {getSessionHostDisplayName(session)}
                           </span>
                         </div>
                         <div className="flex items-center gap-1.5">

@@ -1,6 +1,7 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { StreamChat } from "stream-chat";
 import toast from "react-hot-toast";
+import { useUser } from "@clerk/clerk-react";
 import {
   initializeStreamClient,
   disconnectStreamClient,
@@ -8,11 +9,33 @@ import {
 import { sessionApi } from "../api/sessions.js";
 
 function useStreamClient(session, loadingSession, isHost, isParticipant) {
+  const { user } = useUser();
   const [streamClient, setStreamClient] = useState(null);
   const [call, setCall] = useState(null);
   const [chatClient, setChatClient] = useState(null);
   const [channel, setChannel] = useState(null);
   const [isInitializingCall, setIsInitializingCall] = useState(true);
+
+  const clerkDisplayName = useMemo(() => {
+    const fullName = user?.fullName?.trim();
+    if (fullName) return fullName;
+
+    const firstLast = [user?.firstName, user?.lastName]
+      .filter(Boolean)
+      .join(" ")
+      .trim();
+    if (firstLast) return firstLast;
+
+    const username = user?.username?.trim();
+    if (username) return username;
+
+    const emailPrefix = user?.primaryEmailAddress?.emailAddress
+      ?.split("@")[0]
+      ?.trim();
+    if (emailPrefix) return emailPrefix;
+
+    return "";
+  }, [user]);
 
   useEffect(() => {
     let videoCall = null;
@@ -27,11 +50,15 @@ function useStreamClient(session, loadingSession, isHost, isParticipant) {
         const { token, userId, userName, userImage } =
           await sessionApi.getStreamToken();
 
+        const finalUserName =
+          clerkDisplayName || userName?.trim() || userId || "User";
+        const finalUserImage = user?.imageUrl || userImage || "";
+
         const client = await initializeStreamClient(
           {
             id: userId,
-            name: userName,
-            image: userImage,
+            name: finalUserName,
+            image: finalUserImage,
           },
           token,
         );
@@ -48,8 +75,8 @@ function useStreamClient(session, loadingSession, isHost, isParticipant) {
         await chatClientInstance.connectUser(
           {
             id: userId,
-            name: userName,
-            image: userImage,
+            name: finalUserName,
+            image: finalUserImage,
           },
           token,
         );
@@ -84,7 +111,7 @@ function useStreamClient(session, loadingSession, isHost, isParticipant) {
         }
       })();
     };
-  }, [session, loadingSession, isHost, isParticipant]);
+  }, [session, loadingSession, isHost, isParticipant, clerkDisplayName, user]);
 
   return {
     streamClient,

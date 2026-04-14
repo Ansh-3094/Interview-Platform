@@ -6,9 +6,16 @@ import HomePage from "./pages/HomePage.jsx";
 import ProblemPage from "./pages/ProblemPage.jsx";
 import ProblemsPage from "./pages/ProblemsPage.jsx";
 import SessionPage from "./pages/SessionPage.jsx";
+import useLiveSessionLock from "./hooks/useLiveSessionLock.js";
 
 function App() {
   const { isSignedIn, isLoaded } = useUser();
+  const { isInLiveSession, liveSessionId, isCheckingLiveSession } =
+    useLiveSessionLock();
+
+  const blockedProblemsRedirect = liveSessionId
+    ? `/session/${liveSessionId}`
+    : "/dashboard";
 
   //This will get rid of the Flickering Effect
   if (!isLoaded) {
@@ -30,7 +37,17 @@ function App() {
 
         <Route
           path="/problems"
-          element={isSignedIn ? <ProblemsPage /> : <Navigate to={"/"} />}
+          element={
+            isSignedIn ? (
+              isCheckingLiveSession ? null : isInLiveSession ? (
+                <Navigate to={blockedProblemsRedirect} replace />
+              ) : (
+                <ProblemsPage />
+              )
+            ) : (
+              <Navigate to={"/"} />
+            )
+          }
         />
 
         <Route
@@ -40,7 +57,17 @@ function App() {
 
         <Route
           path="/problem/:id"
-          element={isSignedIn ? <ProblemPage /> : <Navigate to={"/"} />}
+          element={
+            isSignedIn ? (
+              isCheckingLiveSession ? null : isInLiveSession ? (
+                <Navigate to={blockedProblemsRedirect} replace />
+              ) : (
+                <ProblemPage />
+              )
+            ) : (
+              <Navigate to={"/"} />
+            )
+          }
         />
       </Routes>
       <Toaster />

@@ -158,6 +158,7 @@ function DashboardPage() {
               isError={activeSessionsError}
               onRetry={refetchActiveSessions}
               isUserInSession={isUserInSession}
+              currentUser={user}
             />
           </div>
 

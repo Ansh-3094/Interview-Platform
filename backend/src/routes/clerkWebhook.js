@@ -41,6 +41,13 @@ router.post(
       });
     }
 
+    if (evt.type === "user.updated") {
+      await inngest.send({
+        name: "clerk.user.updated",
+        data: evt.data,
+      });
+    }
+
     res.status(200).json({ success: true });
   },
 );
