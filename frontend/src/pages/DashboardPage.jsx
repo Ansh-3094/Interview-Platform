@@ -2,10 +2,10 @@ import { useNavigate } from "react-router";
 import { useUser } from "@clerk/clerk-react";
 import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
+import { useQueryClient } from "@tanstack/react-query";
 import {
-  useActiveSessions,
   useCreateSession,
-  useMyRecentSessions,
+  useDashboardBootstrap,
 } from "../hooks/useSession.js";
 
 import Navbar from "../components/Navbar.jsx";
@@ -18,6 +18,7 @@ import CreateSessionModal from "../components/CreateSessionModal.jsx";
 function DashboardPage() {
   const navigate = useNavigate();
   const { user } = useUser();
+  const queryClient = useQueryClient();
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [createdSessionData, setCreatedSessionData] = useState(null);
   const [roomConfig, setRoomConfig] = useState({
@@ -29,29 +30,28 @@ function DashboardPage() {
   const createSessionMutation = useCreateSession();
 
   const {
-    data: activeSessionsData,
-    isLoading: loadingActiveSessions,
-    isRefetching: refetchingActiveSessions,
-    isError: activeSessionsError,
-    refetch: refetchActiveSessions,
-  } = useActiveSessions();
-  const {
-    data: recentSessionsData,
-    isLoading: loadingRecentSessions,
-    isRefetching: refetchingRecentSessions,
-    isError: recentSessionsError,
-    refetch: refetchRecentSessions,
-  } = useMyRecentSessions();
+    data: dashboardData,
+    isLoading: loadingDashboard,
+    isRefetching: refetchingDashboard,
+    isError: dashboardError,
+    refetch: refetchDashboard,
+  } = useDashboardBootstrap();
 
   useEffect(() => {
-    const handleFocus = () => {
-      refetchActiveSessions();
-      refetchRecentSessions();
-    };
+    if (!dashboardData) return;
 
-    window.addEventListener("focus", handleFocus);
-    return () => window.removeEventListener("focus", handleFocus);
-  }, [refetchActiveSessions, refetchRecentSessions]);
+    queryClient.setQueryData(["problems"], {
+      problems: dashboardData.problems || {},
+    });
+
+    queryClient.setQueryData(["activeSessions"], {
+      sessions: dashboardData.sessions?.activeSessions || [],
+    });
+
+    queryClient.setQueryData(["myRecentSessions"], {
+      sessions: dashboardData.sessions?.recentSessions || [],
+    });
+  }, [dashboardData, queryClient]);
 
   const handleCreateRoom = () => {
     if (!roomConfig.problemId) return;
@@ -123,11 +123,11 @@ function DashboardPage() {
     navigate(`/session/${sessionId}`);
   };
 
-  const activeSessions = activeSessionsData?.sessions || [];
+  const activeSessions = dashboardData?.sessions?.activeSessions || [];
   const activeOnlySessions = activeSessions.filter(
     (session) => session.status === "active",
   );
-  const recentSessions = recentSessionsData?.sessions || [];
+  const recentSessions = dashboardData?.sessions?.recentSessions || [];
 
   const isUserInSession = (session) => {
     if (!user.id) return false;
@@ -153,10 +153,10 @@ function DashboardPage() {
             />
             <ActiveSessions
               sessions={activeSessions}
-              isLoading={loadingActiveSessions}
-              isRefreshing={refetchingActiveSessions}
-              isError={activeSessionsError}
-              onRetry={refetchActiveSessions}
+              isLoading={loadingDashboard}
+              isRefreshing={refetchingDashboard}
+              isError={dashboardError}
+              onRetry={refetchDashboard}
               isUserInSession={isUserInSession}
               currentUser={user}
             />
@@ -164,10 +164,10 @@ function DashboardPage() {
 
           <RecentSessions
             sessions={recentSessions}
-            isLoading={loadingRecentSessions}
-            isRefreshing={refetchingRecentSessions}
-            isError={recentSessionsError}
-            onRetry={refetchRecentSessions}
+            isLoading={loadingDashboard}
+            isRefreshing={refetchingDashboard}
+            isError={dashboardError}
+            onRetry={refetchDashboard}
           />
         </div>
       </div>

@@ -41,6 +41,14 @@ export const sessionApi = {
     return response.data;
   },
 
+  getDashboardBootstrap: async ({ token } = {}) => {
+    const response = await axiosInstance.get(
+      "/sessions/dashboard",
+      withAuthHeaders(token),
+    );
+    return response.data;
+  },
+
   getSessionById: async ({ id, token }) => {
     const response = await axiosInstance.get(
       `/sessions/${id}`,

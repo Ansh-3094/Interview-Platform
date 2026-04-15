@@ -30,7 +30,8 @@ export const useActiveSessions = () => {
     enabled: isLoaded && !!isSignedIn,
     retry: 2,
     retryDelay: 1000,
-    refetchOnWindowFocus: true,
+    staleTime: 1000 * 60 * 2,
+    refetchOnWindowFocus: false,
   });
   return result;
 };
@@ -47,9 +48,27 @@ export const useMyRecentSessions = () => {
     enabled: isLoaded && !!isSignedIn,
     retry: 2,
     retryDelay: 1000,
-    refetchOnWindowFocus: true,
+    staleTime: 1000 * 60 * 2,
+    refetchOnWindowFocus: false,
   });
   return result;
+};
+
+export const useDashboardBootstrap = () => {
+  const { isLoaded, isSignedIn, getToken } = useAuth();
+
+  return useQuery({
+    queryKey: ["dashboardBootstrap"],
+    queryFn: async () => {
+      const token = await getToken();
+      return sessionApi.getDashboardBootstrap({ token });
+    },
+    enabled: isLoaded && !!isSignedIn,
+    retry: 2,
+    retryDelay: 1000,
+    staleTime: 1000 * 60 * 2,
+    refetchOnWindowFocus: false,
+  });
 };
 
 export const useSessionById = (id) => {

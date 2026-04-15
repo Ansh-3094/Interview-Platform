@@ -7,6 +7,9 @@ import { PROBLEMS } from "../data/problems.js";
 
 const PASSWORD_LENGTH = 8;
 const ALLOWED_DIFFICULTIES = new Set(["easy", "medium", "hard", "open"]);
+const SESSION_LIST_SELECT =
+  "problemId problem difficulty status host participant callId createdAt updatedAt";
+const USER_LIST_SELECT = "name profileImage email clerkId";
 
 function generateSessionPassword(length = PASSWORD_LENGTH) {
   const chars = "ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz23456789";
@@ -22,6 +25,29 @@ function generateSessionPassword(length = PASSWORD_LENGTH) {
 
 function hashSessionPassword(password) {
   return crypto.createHash("sha256").update(password).digest("hex");
+}
+
+async function queryActiveSessions() {
+  return Session.find({
+    status: { $in: ["active", "completed"] },
+  })
+    .select(SESSION_LIST_SELECT)
+    .populate("host", USER_LIST_SELECT)
+    .populate("participant", USER_LIST_SELECT)
+    .sort({ createdAt: -1 })
+    .limit(50)
+    .lean();
+}
+
+async function queryMyRecentSessions(userId) {
+  return Session.find({
+    status: "completed",
+    $or: [{ host: userId }, { participant: userId }],
+  })
+    .select(SESSION_LIST_SELECT)
+    .sort({ createdAt: -1 })
+    .limit(20)
+    .lean();
 }
 
 export async function createSession(req, res) {
@@ -112,14 +138,7 @@ export async function createSession(req, res) {
 
 export async function getActiveSessions(_, res) {
   try {
-    const sessions = await Session.find({
-      status: { $in: ["active", "completed"] },
-    })
-      //populate() replace a referenced ObjectId with actual document data from another collection.
-      .populate("host", "name profileImage email clerkId")
-      .populate("participant", "name profileImage email clerkId")
-      .sort({ createdAt: -1 })
-      .limit(50);
+    const sessions = await queryActiveSessions();
 
     res.status(200).json({ sessions });
   } catch (error) {
@@ -134,13 +153,8 @@ export async function getMyRecentSessions(req, res) {
   try {
     const userId = req.user._id;
 
-    //Get Sessions where user is either host or participant and we only give sessions which are completed thats why status: "completed"
-    const sessions = await Session.find({
-      status: "completed",
-      $or: [{ host: userId }, { participant: userId }],
-    })
-      .sort({ createdAt: -1 })
-      .limit(20);
+    // Get sessions where the user is host or participant and already completed.
+    const sessions = await queryMyRecentSessions(userId);
 
     res.status(200).json({ sessions });
   } catch (error) {
@@ -166,6 +180,30 @@ export async function getSessionById(req, res) {
     res.status(200).json({ session });
   } catch (error) {
     console.log("Error in getSessionById  controller", error.message);
+    res.status(500).json({
+      message: "Internal Server Error",
+    });
+  }
+}
+
+export async function getDashboardBootstrap(req, res) {
+  try {
+    const userId = req.user._id;
+
+    const [activeSessions, recentSessions] = await Promise.all([
+      queryActiveSessions(),
+      queryMyRecentSessions(userId),
+    ]);
+
+    res.status(200).json({
+      problems: PROBLEMS,
+      sessions: {
+        activeSessions,
+        recentSessions,
+      },
+    });
+  } catch (error) {
+    console.log("Error in getDashboardBootstrap controller", error.message);
     res.status(500).json({
       message: "Internal Server Error",
     });
