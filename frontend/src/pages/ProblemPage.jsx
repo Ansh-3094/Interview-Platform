@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useNavigate, useParams } from "react-router";
 import Navbar from "../components/Navbar.jsx";
 import { Panel, PanelGroup, PanelResizeHandle } from "react-resizable-panels";
@@ -16,7 +16,10 @@ function ProblemPage() {
   const navigate = useNavigate();
   const { data: problemsData, isLoading, isError } = useProblems();
 
-  const problemsMap = problemsData?.problems || {};
+  const problemsMap = useMemo(
+    () => problemsData?.problems || {},
+    [problemsData],
+  );
   const hasProblems = Object.keys(problemsMap).length > 0;
 
   const [currentProblemId, setCurrentProblemId] = useState("practice-freely");
@@ -25,11 +28,15 @@ function ProblemPage() {
   const [output, setOutput] = useState(null);
   const [isRunning, setIsRunning] = useState(false);
 
-  const orderedProblems = Object.values(problemsMap).sort((a, b) => {
-    if (a.id === "practice-freely") return -1;
-    if (b.id === "practice-freely") return 1;
-    return a.title.localeCompare(b.title);
-  });
+  const orderedProblems = useMemo(
+    () =>
+      Object.values(problemsMap).sort((a, b) => {
+        if (a.id === "practice-freely") return -1;
+        if (b.id === "practice-freely") return 1;
+        return a.title.localeCompare(b.title);
+      }),
+    [problemsMap],
+  );
 
   const currentProblem = problemsMap[currentProblemId];
   const isFreestyle = currentProblem?.mode === "freestyle";
